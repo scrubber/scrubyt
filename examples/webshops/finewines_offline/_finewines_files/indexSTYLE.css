@@ -1,0 +1,398 @@
+/* CSS Document */
+
+			#title { color: #9e8623; font-size: 11px; font-family: arial, helvetica }
+			.head { color: #800000; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			.headlight { color: #800000; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			.headlightgrey { color: #666666; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			.narrative { color: #333333; font-size: 14px; font-family: Arial, Helvetica}
+			.nav { font-size: 10px; font-family: Arial, Helvetica, Geneva; text-decoration: none }
+			.navhead {
+	color: #333333;
+	font-weight: bold;
+	font-size: 10px;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: left;
+	text-transform: none;
+	text-decoration: none;
+	}
+			.prodcont { color: #333; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			.prodhead { color: #333; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva; text-transform: uppercase }
+			.subheadgrey { color: #666666; font-weight: bold; font-size: 18px; font-family: Arial, Helvetica, Geneva }
+			.subheadbrown{ color: #754401; font-weight: bold; font-size: 18px; font-family: Arial, Helvetica, Geneva }
+			.brownbig{ color: #754401; font-weight: bold; font-size: 36px; font-family: Arial, Helvetica, Geneva }
+			.subheadlight { color: #8db4a8; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			.uppersubhead { color: #990000; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular; text-transform: uppercase }
+			.vintagesbody { color: #333; font-size: 14px; font-family: arial, helvetica; text-transform: uppercase }
+			.vintagesheadlight { color: maroon; font-size: 14px; font-family: arial, helvetica; text-transform: uppercase }
+			a href {
+	font-style: normal;
+	font-size: 14px;
+	font-family: Arial, Helvetica, Geneva;
+	font-weight: normal;
+	color: #000066;
+}
+			b { color: #333; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva; text-transform: uppercase }
+			br { color: #333; font-size: 14px }
+			h1 { color: #000000; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			h2 { color: #800000; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			h3 { color: #8db4a8; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			h4 { color: #8db4a8; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			h5 { color: #333; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular; text-transform: uppercase }
+			h6 { color: #800000; font-weight: normal; font-size: 14px; font-family: FontName, Arial, Helvetica, Geneva, Swiss, SunSans-Regular; text-transform: uppercase }
+			p { color: #333; font-size: 14px; font-family: Arial, Helvetica, Geneva }
+			
+.categhead { color: #800000; font-weight: bold; font-size: 20px; font-family: Arial, Helvetica, Geneva ; text-transform: uppercase; line-height: normal;}
+.stars { color: #333333; font-size: 16px; font-family: Geneva, Arial, Helvetica, san-serif; font-weight: bold}
+.foodmatch { color: #333333; font-size: 14px; font-family: arial, helvetica ; font-weight: bold}
+.navhead:hover   { color: #526E00; font-size: 11px; font-family: GillSans, Arial, Helvetica, Geneva; font-weight: bold; text-align: left; text-decoration: none; background-color: #e1ece9;}
+.navheadred {
+	color: #990000;
+	font-weight: bold;
+	font-size: 11px;
+	font-family: Gillsans, Arial, Helvetica, sans-serif;
+	text-align: left;
+	text-transform: none;
+	text-decoration: none;
+	font-style: normal;
+	
+}
+
+.navfooter { 
+	
+	text-decoration:none;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #000000;
+
+}
+
+.navfooter:hover   { 
+
+	color : #006666;
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 13px;
+	text-decoration : underline;
+	font-weight: normal;
+	font-style: normal;
+
+}
+
+
+a {
+	text-decoration:none;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #000066;
+}
+
+
+a:visited {
+	color : #330033;
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 13px;
+	font-weight: normal;
+	text-decoration: none;
+
+}
+
+a:active {
+	color : #330033;
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 13px;
+	font-weight: normal;
+	text-decoration: none;
+	
+}
+
+a:hover {
+	color : #006666;
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 13px;
+	font-weight: normal;
+	font-style: normal;
+
+}
+
+.indexBar {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: bold;
+	text-transform: none;
+	color: #000000;
+}
+.opening {
+	color: #FFFFFF;
+	font-weight: bold;
+	font-size: 14px;
+	font-family: Arial, Helvetica, Geneva;
+	background-color: #990000;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.subcategoryWhite {font-family: Arial, Helvetica, sans-serif; font-size: 13px;font-weight: bold; background-color: #e1ece9;}
+.subcategoryAqua {font-family: Arial, Helvetica, sans-serif; font-size: 13px;font-weight: bold; background-color: #FFFFFF;}
+.releaseButton {
+	color: #000000;
+	font-weight: normal;
+	font-size: 11px;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: left;
+	text-transform: none;
+	text-decoration: none;
+	font-style: normal;
+	}
+.subheadside {
+	color: #800000;
+	font-weight: bold;
+	font-size: 12px;
+	font-family: gillsans, Arial, Helvetica, Geneva;
+}
+.address {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: capitalize;
+}
+.navheadstrip { color: #EEEEEE; font-weight: normal; font-size: 12px; font-family: GillSans, Arial, Helvetica, Geneva; word-spacing: 1px; letter-spacing: 2px ; background-color: #990000}
+
+.border {  border: 1px #FFFFFF solid}
+.menutitle{
+cursor:pointer;
+margin-bottom: 5px;
+background-color:#999966;
+color:#FFFFFF;
+text-decoration:none;
+	font-family: Verdana;
+	font-size: 12px;
+	font-weight: bold;
+	/*/*/border:1px solid #666633;/* */
+}
+.submenu{
+cursor:pointer;
+margin-bottom: 5px;
+background-color:white;
+color:#FFFFFF;
+text-decoration:none;
+	font-family: Verdana;
+	font-size: 12px;
+	font-weight: bold;
+	
+}
+
+.white {
+	color: #FFFFFF;
+	font-weight: normal;
+	font-size: 12px;
+	font-family: Arial, Helvetica, Geneva;
+	
+}
+.gifts { color: #330033; font-weight: normal; font-size: 14px; font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  }
+
+.giftsgrey { color: #666666; font-weight: bold; font-size: 36px; font-family: Times New Roman;  }
+.giftsblack{ color: #333; font-weight: bold; font-size: 12px; font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular; text-transform: uppercase }
+.giftswhite{ color: #ffffff; font-weight: bold; font-size: 16px; font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular; text-transform: none }
+
+.bleu{
+	color : #000066;
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 13px;
+	font-weight: normal;
+	font-style: normal;
+
+}
+.releaseRed {font-family: Arial, Helvetica, sans-serif; color : #990000; font-size: 12px;font-weight: bold;}
+
+
+.borderindex {
+border: 1px #993399 solid;
+font-family : Arial, Helvetica, sans-serif;
+}
+
+.here {cursor:pointer;
+margin-bottom: 5px;
+background-color:#CCCC99;
+color:#FFFFFF;
+text-decoration:none;
+	font-family: Verdana;
+	font-size: 12px;
+	font-weight: bold;
+	}
+
+.bordervintage {border: 1px #330033 solid}
+
+.blackHead {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #000000;
+}
+.blueTitle {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 16px;
+	color: #089CC2;
+	text-transform: none;
+
+
+}
+
+
+.bordertype {border: 1px #E8E8E8 solid}
+
+
+/* ESSENTIALS STYLES */ 
+.menuTopNavEssentials
+{
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	background-color:#330033;
+	border-top: 2px outset #663366;
+	border-bottom: 1px outset #663366;
+	border-left: 2px outset #663366;
+	border-right: 1px outset #663366;
+	font-family: Arial, Helvetica
+}
+
+
+.textMenuEssentials
+{
+	color: #333333;  
+	font-size: 14px;
+	font-weight: normal;
+	border-left: 1px outset #CC99CC;
+	border-right: 1px outset #CC99CC;
+	border-bottom: 1px outset #CC99CC;
+	font-family: Arial, Helvetica
+
+}
+
+			.essentials { color: #330033; font-weight: bold; font-size: 14px; font-family: Arial, Helvetica, Geneva; text-transform: uppercase }
+			.subhead { color: #800000; font-weight: normal; font-size: 18px; font-family: Arial, Helvetica, Geneva }
+			.esstext { color: #330033; font-weight: normal; font-size: 18px; font-family: Arial, Helvetica, Geneva }
+
+
+.menuVintages
+{
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	background-color:#330033;
+	border-top: 2px outset #663366;
+	border-bottom: 1px outset #663366;
+	border-left: 2px outset #663366;
+	border-right: 1px outset #663366;
+	font-family: Arial, Helvetica
+}
+
+
+.textMenuRetail
+{
+	color: black;  
+	font-size: 14px;
+	font-weight: normal;
+	border-left: 1px outset #993399;
+	border-right: 1px outset #993399;
+	border-bottom: 1px outset #993399;
+	font-family: Arial, Helvetica
+}
+
+.menuRetail
+{
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	font-family: Arial, Helvetica;
+	border-top: 2px outset #993399;
+	border-bottom: 1px outset #993399;
+	border-left: 2px outset #993399;
+	border-right: 1px outset #993399;
+	background: #660066;
+	font-family: Arial, Helvetica
+}
+
+
+.textTopEducation { 
+color: #663366; 
+font-weight: normal; 
+font-size: 16px; 
+font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular;  
+}
+
+.menuEducation
+{
+	font-weight: bold; 
+	font-size: 16px; 
+	font-family: Arial, Helvetica, Geneva, Swiss, SunSans-Regular; 
+	color: white;
+	border-top: 2px outset #CC99CC;
+	border-bottom: 1px outset #CC99CC;
+	border-left: 2px outset #CC99CC;
+	border-right: 1px outset #CC99CC;
+	background: #996699;
+}
+
+.textMenuEducation
+{
+	color: #333333;  
+	font-size: 14px;
+	font-weight: normal;
+	border-left: 1px outset #CC99CC;
+	border-right: 1px outset #CC99CC;
+	border-bottom: 1px outset #CC99CC;
+	font-family: Arial, Helvetica
+}
+
+.menuGifts
+{
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	font-family: Arial, Helvetica;
+	border-top: 2px outset #996699;
+	border-bottom: 1px outset #996699;
+	border-left: 2px outset #996699;
+	border-right: 1px outset #996699;
+	background: #663366;
+
+}
+
+.menuClassics
+{
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	font-family: Arial, Helvetica;
+	border-top: 2px outset #CCCCCC;
+	border-bottom: 1px outset #CCCCCC;
+	border-left: 2px outset #CCCCCC;
+	border-right: 1px outset #CCCCCC;
+	background: #999999;
+
+}
+
+.textMenuClassics
+{
+	color: #6B799E;  
+	font-size: 14px;
+	font-weight: normal;
+	border-left: 1px outset #CCCCCC;
+	border-right: 1px outset #CCCCCC;
+	border-bottom: 1px outset #CCCCCC;
+	font-family: Arial, Helvetica
+}
+
+.textMenuVintages
+{
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	font-family: Arial, Helvetica
+}

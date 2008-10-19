@@ -1,0 +1,99 @@
+= scRUBYt! - Hpricot and Mechanize (or FireWatir)  on steroids
+
+A simple to learn and use, yet very powerful web extraction framework written in Ruby. Navigate through the Web, Extract, query, transform and save relevant data from the Web page of your interest by the concise and easy to use DSL.
+
+Do you think that Mechanize and Hpricot are powerful libraries? You're right, they are, indeed - hats off to their authors: without these libs scRUBYt! could not exist now! I have been wondering whether their functionality could be still enhanced further - so I took these two powerful ingredients, threw in a handful of smart heuristics, wrapped them around with a chunky DSL coating and sprinkled the whole stuff with a lots of convention over configuration(tm) goodies - and ... enter scRUBYt! and decide it yourself.
+
+= Wait... why do we need one more web-scraping toolkit?
+
+After all, we have HPricot, and Rubyful-soup, and Mechanize, and scrAPI, and ARIEL and scrapes and ...
+Well, because scRUBYt! is different. It has an entirely different philosophy, underlying techniques, theoretical background, use cases, todo list, real-life scenarios etc.  - shortly it should be used in different situations with different requirements than the previosly mentioned ones.
+
+If you need something quick and/or would like to have maximal control over the scraping process, I recommend HPricot. Mechanize shines when it comes to interaction with Web pages. Since scRUBYt! is operating based on XPaths, sometimes you will chose scrAPI because CSS selectors will better suit your needs. The list goes on and on, boiling down to the good old mantra: use the right tool for the right job!
+
+I hope there will be also times when you will want to experiment with Pandora's box and reach after the power of scRUBYt! :-)
+
+= Sounds fine - show me an example!
+
+Let's apply the "show don't tell" principle. Okay, here we go:
+
+<tt>ebay_data = Scrubyt::Extractor.define do</tt>
+
+  fetch 'http://www.ebay.com/'
+  fill_textfield 'satitle', 'ipod'
+  submit
+  click_link 'Apple iPod'
+  
+  record do
+    item_name 'APPLE NEW IPOD MINI 6GB MP3 PLAYER SILVER'
+    price '$71.99'
+  end
+  next_page 'Next >', :limit => 5
+
+<tt>end</tt>
+
+output:
+
+<tt><root></tt>
+    <record>
+      <item_name>APPLE IPOD NANO 4GB - PINK - MP3 PLAYER</item_name>
+      <price>$149.95</price>
+    </record>
+    <record>
+      <item_name>APPLE IPOD 30GB BLACK VIDEO/PHOTO/MP3 PLAYER</item_name>
+      <price>$172.50</price>
+    </record>
+    <record>
+      <item_name>NEW APPLE IPOD NANO 4GB PINK MP3 PLAYER</item_name>
+      <price>$171.06</price>
+    </record>
+    <!-- another 200+ results -->
+<tt></root></tt>
+
+This was a relatively beginner-level example (scRUBYt knows a lot more than this and there are much complicated extractors than the above one) - yet it did a lot of things automagically. First of all,
+it automatically loaded the page of interest (by going to ebay.com, automatically searching for ipods
+and narrowing down the results by clicking on 'Apple iPod'), then it extracted *all* the items that
+looked like the specified example (which btw described also how the output structure should look like) - on the first 5 result pages. Not so bad for about 10 lines of code, eh?
+
+= OK, OK, I believe you, what should I do?
+
+You can find everything you will need at these addresses (or if not, I doubt you will find it elsewhere...). See the next section about installation, and after installing be sure to check out these URLs:
+
+* <a href='http://www.rubyrailways.com'>rubyrailways.com</a> - for some theory; if you would like to take a sneak peek at web scraping in general and/or you would like to understand what's going on under the hood, check out <a href='http://www.rubyrailways.com/data-extraction-for-web-20-screen-scraping-in-rubyrails'>this article about web-scraping</a>!
+* <a href='http://scrubyt.org'>http://scrubyt.org</a> - your source of tutorials, howtos, news etc.
+* <a href='http://scrubyt.rubyforge.org'>scrubyt.rubyforge.org</a> - for an up-to-date, online Rdoc
+* <a href='http://projects.rubyforge.org/scrubyt'>projects.rubyforge.org/scrubyt</a> - for developer info, including open and closed bugs, files etc.
+* projects.rubyforge.org/scrubyt/files... - fair amount (and still growing with every release) of examples, showcasing the features of scRUBYt!
+* planned: public extractor repository - hopefully (after people realize how great this package is :-)) scRUBYt! will have a community, and people will upload their extractors for whatever reason
+
+If you still can't find something here, drop a mail to the guys at scrubyt@/NO-SPAM/scrubyt.org!
+
+= How to install
+
+scRUBYt! requires these packages to be installed:
+
+* Ruby 1.8.4
+* Hpricot 0.5
+* Mechanize 0.6.3
+
+I assume you have ruby any rubygems installed. To install WWW::Mechanize 0.6.3 or higher, just run
+
+<tt>sudo gem install mechanize</tt>
+
+Hpricot 0.5 is just hot off the frying pan - perfect timing, _why! - install it with 
+
+<tt>sudo gem install hpricot</tt>
+
+Once all the dependencies (Mechanize and Hpricot) are up and running, you can install scrubyt with
+
+<tt>sudo gem install scrubyt</tt>
+
+If you encounter any problems, drop a mail to the guys at scrubyt@/NO-SPAM/scrubyt.org!
+
+= Author
+
+Copyright (c) 2006 by Peter Szinek (peter@/NO-SPAM/rubyrailways.com)
+
+= Copyright
+
+This library is distributed under the GPL.  Please see the LICENSE file.

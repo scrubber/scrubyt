@@ -1,0 +1,12 @@
+<root>
+  <main>
+    <detail>Detail 1</detail>
+    <detail>Detail 2</detail>
+    <detail>Detail 3</detail>
+  </main>
+  <main>
+    <detail>Detail 4</detail>
+    <detail>Detail 5</detail>
+    <detail>Detail 6</detail>
+  </main>
+</root>

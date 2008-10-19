@@ -1,0 +1,73 @@
+scRUBYt! Backlog
+
+[NEW] Rails runner - possibility to upload (or type into a form) an extractor, launch it and get back the result
+[NEW] when crawling to more pages, save the XMLs one by one rather than once at the end
+
+[NEW] select indices should evaluate as much results as needed (if possible - if there is :last for example, this is not possiblle)
+
+[IDEA] One thing I’d like to suggest is the use of a proxy to record interactions with a webpage and automatically allow the user to select items to parse or record a user’s interactions, generate the right script to get the user to that page (including POSTs / GETS) and let the user then select items to parse out of the target page.
+Discuss this with the others
+
+[NEW] exporting of crawling-to-next-page pattern (xpath, '.*' => '.*/page{num}')
+TODO: CHEATSHEET!
+TODO: all_img is substitute for 
+      all_img '//img' etc.
+      i.e. if a pattern name is also a html tag, behave like this
+TODO: lotsa unit tests
+TODO: to_csv, to_txt, to_rss, to_ruport, to_class, to_db, to_whatever (Tim Fletcher)
+TODO: simple xslt transformation
+TODO: ensure_value_is_greater_than 10
+
+TODO: Performance optimization (check that nothing is loaded twice, probably just reference the
+      input document instead of using it as a hash key twice and hash value once etc.) 
+      Discuss this with the others
+
+TODO: Possibility of explicitly define example type - for example it may be possible that
+      I want to match an XPath on the page and thus the example may look like '/html/body/table[1]'
+      yet it is not an XPath but a String example; in these cases, possibility to say:
+ 
+      xpath_stuff '/html/body/table[1]', :type => :string
+TODO: Compound pattern, e.g.:
+      <item>
+        <price>$1.99</price>
+        <shipping>$8.01</shipping>
+        <total>$10.00</total>      --> This is the compund pattern
+      </item>
+      
+      This should look something like:
+      item do
+        price '$1.99'
+        shipping '$8.01'
+        total 'price', 'shipping', :type => compound, :function => :add_prices
+      end
+
+      def add_prices(price, shipping)
+        price(1..price.size).to_i + price(1..shipping.size).to_i
+      end
+
+TODO: setup Joomla (move it to extractors.scrubyt.org)
+TODO: refactor the whole constraint system
+TODO: unit tests!!!
+
+TODO: Widgets module - e.g. Widgets::Dropdown
+usage (victor from mexico):
+
+Widgets::Dropdown('houses').each_value do |house|
+  Widgets::Dropdown('districts').each_value do  |district|
+    scrape ( house, district )
+
+TODO: RSS feed on the recent changes
+
+TODO: to_db(pattern_name)
+e.g.
+
+root
+--- book
+    --- title
+    --- author
+    
+to_db(book) will create a table book with columns title and author
+TODO: self correcting wrappers; see Assaf's ideas (after learning, save the CSS selectors, IDs, classes etc) and 
+re-learn from those)
+      
+

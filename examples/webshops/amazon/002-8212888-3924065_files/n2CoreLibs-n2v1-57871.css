@@ -1,0 +1,364 @@
+
+/*! ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    Amazon.com Nav 2.0 Stylesheet
+    ----------------------------------------------------------
+    Copyright (c) Amazon.com 2003-2006.  All Rights Reserved.
+    Not to be reused without permission.
+
+    $Revision: #2 $
+    $DateTime: 2006/07/03 19:00:15 $
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+
+
+
+.micro,
+.micro a {
+    font-size: 8px;
+    line-height: 9px;
+    font-weight: bold;
+    color: #333;
+    text-transform:uppercase;
+}
+.microNB,
+.microNB a {
+    font-size: 8px;
+    line-height: 9px;
+    font-weight: normal;
+    color: #333;
+    text-transform:uppercase;
+}
+.microSelected,
+.microSelected a {
+    font-size: 8px;
+    line-height: 9px;
+    font-weight: bold;
+    color: #000;
+    text-transform:uppercase;
+}
+.microDisabled {
+    font-size: 8px;
+    line-height: 9px;
+    font-weight: normal;
+    color: #666;
+    text-transform:uppercase;
+}
+.n2 .price {
+    color: #900;
+    font-size: 11px;
+}
+.bigPrice {
+    color: #900;
+    font-size: 20px;
+}
+
+
+
+
+
+
+.n2Pop {
+    border: 1px outset #EEEDDD;
+    background-color:#fff;
+    position:absolute;
+    z-index:200;
+}
+.n2PopStatic {
+    border: 1px outset #555533;
+    background-color:#fff;
+    position:absolute;
+    z-index:200;
+}
+.n2,
+.n2 td {
+    font-size: 11px;
+    font-family: verdana;
+}
+.n2PopBody {
+    background-color:#fff;
+    border:3px solid #EFEDD4;
+}
+.n2 a,
+.n2 a:visited,
+.n2 a:hover,
+.n2 a:active {
+    color: #039;
+    text-decoration:none;
+    font-size: 11px;
+    font-family: verdana;
+}
+.n2 a:hover {
+    color: #c60;
+    text-decoration:underline;
+}
+.local,
+.internalLink {
+}
+.n2 .local a:hover {
+    color: #c60;
+    text-decoration:underline;
+}
+.n2 .internalLink a:hover {
+    color: #c60;
+    text-decoration:none;
+    border-bottom:1px dashed #c60;
+}
+.n2 .highlight {
+    color: #c60;
+}
+.whiteBG {
+    background-color: #fff;
+}
+.n2 .highlightBar {
+    background-color: #EBF3FC;
+    padding: 3px;
+}
+.n2 .popTitle {
+    color: #039;
+    font-size: 0.8em;
+    font-weight: bold;
+    vertical-align:top;
+}
+.n2 .hand,
+.n2 .clickable {
+    cursor: pointer;
+    cursor: hand; 
+    color: #039;
+}
+.n2 .nohand {
+    cursor:default;
+}
+.n2 .divider {
+    border-bottom: 1px dashed #ccc;
+    margin-bottom: 3px;
+}
+.n2 .expandableVOuter {
+    display: none;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+.n2 .expandableVOuterVisible {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+.n2 .expandableHOuter {
+    display: none;
+    overflow: hidden;
+    position: relative;
+}
+.n2 .expandableHOuterVisible {
+    overflow: hidden;
+    position: relative;
+}
+.n2 .expandableInner {
+    position: relative;
+}
+.n2 .dialogBody {
+    background-color: #D5E2F0;
+    padding: 3px;
+    color: #33669B;
+}
+.n2 .showcase {
+    background-color: #fff;
+    border: 1px inset;
+    cursor:auto;
+}
+.n2 .popStaticTitle {
+    background-color:#EFEDD4;
+    height:18px;
+    cursor:move;
+}
+.n2 .popSemiStaticTitle {
+    background-color:#EFEDD4;
+    height:18px;
+    cursor:move;
+}
+.n2 .popTitle {
+    color: #86875D;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 2px 0px 0px 4px;
+}
+.n2 .showVerticalScrollbar {
+    overflow:auto;
+}
+.n2 .showDualScrollbars {
+    overflow:auto;
+}
+.n2 .summaryTitle {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    color: #000;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+.n2 .expMenu div {
+    padding: 4px;
+    color: #039;
+}
+.n2 .expMenu .expMenuSelected a,
+.n2 .expMenu .expMenuSelected a:hover,
+.n2 .expMenu .expMenuSelected a:visited,
+.n2 .expMenu .expMenuSelected a:active {
+    font-weight: bold;
+    color: #000;
+}
+.n2 .expMenu .expMenuSelected a:hover {
+    font-weight: bold;
+    text-decoration:none;
+}
+.n2 .expMenu .expMenuUnselected {
+}
+.n2 .expMenu .expMenuDisabled {
+    color: #ccc;
+}
+.n2 .disabled{
+    color: #ccc;
+}
+.n2 .checkIndent div {
+    padding: 3px 5px 3px 16px;
+    text-indent: -11px;
+}
+.n2ExpProdPane {
+    background-color:#fff;
+}
+.n2ExpProdPaneTitle {
+    font-size: 12px;
+    font-weight: bold;
+}
+.animatedBox {
+    position:absolute;
+    visibility:hidden;
+    border: 1px solid gray;
+    background:white;
+    z-index:220;
+}
+.animatedBoxHollow {
+    position:absolute;
+    visibility:hidden;
+    border: 1px solid gray;
+    z-index:220;
+}
+.n2Fadable {
+  filter:alpha(opacity=100);  ;
+}
+
+
+.n2Reveal {
+    position:absolute;
+    visibility:visible;
+    filter:alpha(opacity=100); 
+    -moz-opacity:100%; 
+    opacity:100%; 
+}
+.n2RevealContent {
+    position:absolute;
+    visibility:hidden;
+    z-index:10;
+    filter:alpha(opacity=0); 
+    opacity:0; 
+    -moz-opacity:0; 
+}
+
+
+.n2ac {
+    font-family: verdana,arial,helvetica,sans-serif;
+    font-size: 11px;
+    border: 1px solid #ABAA7C;
+    background-color:#fff;
+    position:absolute;
+}
+.n2ac .nonSelected {
+    background: #fff;
+    cursor: pointer;
+    cursor: hand; 
+    color: #039;
+    padding: 0 4px 0 4px;
+}
+.n2ac .selected {
+    background: #EFEDD4;
+    cursor: pointer;
+    cursor: hand; 
+    color: #039;
+    padding: 0 4px 0 4px;
+}
+.n2ac .autoScrollbar {
+    
+    scrollbar-face-color: #D0CA90;
+    scrollbar-highlight-color: #F6F6d9;
+    scrollbar-shadow-color: #A99F47;
+    scrollbar-3dlight-color: #D3C99F;
+    scrollbar-arrow-color: 000000;
+    scrollbar-track-color: #EFEDD4;
+    scrollbar-darkshadow-color: #936300;
+    overflow: auto;
+}
+
+
+.n2SliderHandle-horizontal {
+    position:absolute;
+    cursor:w-resize;
+}
+.n2SliderHandle-vertical {
+    position:absolute;
+    cursor:n-resize;
+}
+.n2SliderToolTip-horizontal {
+    position:absolute;
+    font-size: 11px;
+    line-height: 12px;
+    font-family:arial, helvetica, sans-serif;
+    color: #000;
+}
+.n2SliderHandle-vertical {
+    position:absolute;
+    font-size: 8px;
+    line-height: 9px;
+    font-weight: bold;
+    color: #000;
+    text-transform:uppercase;
+}
+.n2Hand, .n2Clickable {
+    cursor: pointer;
+    cursor: hand; 
+}
+
+
+.n2ClickShield {
+    position: absolute;
+    z-index: 10;
+    background-color: white;
+    filter:alpha(opacity=40); 
+    -moz-opacity: .4; 
+    opacity: .4; 
+}
+
+
+.apparelTT {
+    font-family: verdana,arial,helvetica,sans-serif;
+    font-size: x-small;
+    display: block;
+    margin: 4px;
+    margin-left: 3px;
+}
+
+
+.diags,
+.diags td,
+.diags th,
+.diags ol,
+.diags li,
+.diags select,
+.diags input,
+.diags div,
+.diags p {
+    font-size: 11px;
+    font-family: Verdana, sans-serif;
+}
