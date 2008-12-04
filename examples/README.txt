@@ -1,1 +1,0 @@
-These examples are somewhat outdated (in the sense that the input pages might have changed since they were created) - but even if they don't work out of the box, they demonstrate most of the available functionality. 
