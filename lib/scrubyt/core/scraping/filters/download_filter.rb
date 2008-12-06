@@ -8,10 +8,6 @@ module Scrubyt
       download_file(source)
     end #end of method
 
-    def to_sexp
-      [:str, @example]
-    end #end of method to_sexp
-
 private
     def download_file(source)
       return '' if source.size < 4

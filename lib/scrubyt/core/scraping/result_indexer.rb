@@ -48,10 +48,6 @@ module Scrubyt
       ary
     end
     
-    #    def to_sexp
-    #      [:array, *@indices_to_extract.collect { |index| [:lit, index] }]
-    #    end
-    
     private
     ##
     #Do not return the whole result set, just specified indices - like

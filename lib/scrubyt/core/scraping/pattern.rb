@@ -309,32 +309,6 @@ module Scrubyt
       end
     end
 
-    def to_sexp
-      #collect arguments
-      args = []
-      args.push(*@filters.to_sexp_array) if type != :detail_page #TODO: this if shouldn't be there
-      args.push(@options.to_sexp) if !@options.empty?
-
-      #build main call
-      sexp = [:fcall, @name, [:array, *args]]
-
-      if type == :detail_page
-        #add detail page extractor
-        sexp = [:iter, sexp, nil, @filters[0].get_detail_sexp]
-      else
-        #add child block if the pattern has children
-        sexp = [:iter, sexp, nil, [:block, *@children.to_sexp_array ]] if !@children.empty?
-      end
-
-      #add modifier calls - TODO: remove when everything is exported to the options hash
-      @modifier_calls.each do |modifier_sexp|
-        sexp = [:call, sexp, *modifier_sexp]
-      end
-
-      #return complete sexp
-      sexp
-    end
-
     private
     def parse_options_hash(hash)
       #merge provided hash

@@ -33,9 +33,5 @@ module Scrubyt
       root_results
     end
 
-    def get_detail_sexp
-      [:block, *@detail_extractor.result.root_patterns.to_sexp_array]
-    end
-
   end
 end

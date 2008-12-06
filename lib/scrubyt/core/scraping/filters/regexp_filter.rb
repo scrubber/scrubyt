@@ -9,9 +9,5 @@ module Scrubyt
       end
     end
 
-    def to_sexp
-      [:lit, @example]
-    end
-
   end #End of class TreeFilter
 end #End of module Scrubyt

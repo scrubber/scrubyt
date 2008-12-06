@@ -134,13 +134,5 @@ module Scrubyt
       @xpath = XPathUtils.generate_relative_XPath_from_XPaths(parent_xpath, @xpath) if (@xpath =~ /^\/html/) #TODO: should not rely on <html> being the root node
     end
 
-    def to_sexp
-      if @example =~ /.+\[@.+\]$/
-        [:str, "#{@xpath}/@#{@example.scan(/\[@(.+?)\]/)[0][0]}"]
-      else
-        [:str, @xpath]
-      end
-    end
-
   end #End of class TreeFilter
 end #End of module Scrubyt

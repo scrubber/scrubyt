@@ -75,10 +75,6 @@ module Scrubyt
       end
     end
 
-    def to_sexp
-      nil
-    end
-
     private
     #We don't want this to be accessible from outside
     def initialize(parent_pattern, example)

@@ -29,9 +29,6 @@ module Scrubyt
       return []
     end
 
-    def to_sexp
-      [:str, @example]
-    end #end of method to_sexp
   end #End of class TextFilter
 end #End of module Scrubyt
 

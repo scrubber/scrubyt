@@ -10,8 +10,5 @@ module Scrubyt
       end
     end
 
-    def to_sexp
-      [:str, @example]
-    end #end of method to_sexp
   end #End of class AttributeFilter
 end #End of module Scrubyt
