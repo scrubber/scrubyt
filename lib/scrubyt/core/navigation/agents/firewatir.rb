@@ -21,6 +21,7 @@ module Scrubyt
           @@host_name = nil
           @@history = []
           @@current_form = nil
+          @@current_frame = nil
 
           ##
           #Action to fetch a document (either a file or a http address)
@@ -58,12 +59,33 @@ module Scrubyt
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
             store_host_name(@@agent.url)   # in case we're on a new host
           end
+          
+          def self.frame(attribute, value)
+            if @@current_frame
+              @@current_frame.frame(attribute, value)
+            else
+              @@current_frame = @@agent.frame(attribute, value)
+            end
+          end
 
           ##
           #Submit the last form;
-          def self.submit(current_form, button=nil, type=nil)
-            @@agent.element_by_xpath(@@current_form).submit
-            @@agent.wait
+          def self.submit(current_form, sleep_time=nil, button=nil, type=nil)
+            if @@current_frame
+              #BRUTAL hax but FW is such a shitty piece of software
+              #this sucks FAIL omg            
+              @@current_frame.locate
+              form = Document.new(@@current_frame).all.find{|t| t.tagName=="FORM"}
+              form.submit
+            else
+              @@agent.element_by_xpath(@@current_form).submit
+            end            
+            
+            if sleep_time
+              sleep sleep_time
+              @@agent.wait
+            end
+
             @@current_doc_url = @@agent.url
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
@@ -174,9 +196,18 @@ module Scrubyt
             end
           end
         
-          def self.fill_textfield(textfield_name, query_string)
+          def self.fill_textfield(textfield_name, query_string, wait_secs, useValue)
             @@current_form = "//input[@name='#{textfield_name}']/ancestor::form"
-            @@agent.text_field(:name,textfield_name).set(query_string)
+            target = @@current_frame || @@agent
+            if useValue
+              target.text_field(:name,textfield_name).value = query_string              
+            else
+              target.text_field(:name,textfield_name).set(query_string)
+            end
+            sleep(wait_secs) if wait_secs > 0
+            @@mechanize_doc = "<html>#{@@agent.html}</html>"
+            @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
+            
           end
 
           ##

@@ -23,8 +23,12 @@ module Scrubyt
     #textfield is 'q'
     #
     #_query_string_ - the string that should be entered into the textfield
-    def fill_textfield(textfield_name, query_string)
-      FetchAction.fill_textfield(textfield_name, query_string)
+    def fill_textfield(textfield_name, query_string, use_value = nil)
+      FetchAction.fill_textfield(textfield_name, query_string, 0, use_value)
+    end
+    
+    def fill_textfield_and_wait(textfield_name, query_string, sleep_secs=0, use_value=nil)
+      FetchAction.fill_textfield(textfield_name, query_string, sleep_secs, use_value)
     end
     
     ##
@@ -55,13 +59,17 @@ module Scrubyt
     ##
     #Submit the current form
     def submit(index=nil, type=nil)
-      FetchAction.submit(index, type)
+      FetchAction.submit(nil, index, type)
+    end
+    
+    def submit_and_wait(sleep_time, index=nil, type=nil)
+      FetchAction.submit(index, sleep_time,  type)
     end
     
     ##
     #Click the link specified by the text
-    def click_link(link_spec,index=0, sleep_secs=0)
-      FetchAction.click_link(link_spec,index, sleep_secs)
+    def click_link(link_spec,index=0)
+      FetchAction.click_link(link_spec,index, 0)
     end
     
     def click_link_and_wait(link_spec, sleep_secs=0)
@@ -74,6 +82,10 @@ module Scrubyt
     
     def click_image_map(index=0)
       FetchAction.click_image_map(index)
+    end
+    
+    def frame(attribute,value)
+      FetchAction.frame(attribute,value)
     end
     
     def wait(time=1)

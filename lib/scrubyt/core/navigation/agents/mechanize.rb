@@ -65,7 +65,7 @@ module Scrubyt
 
           ##
           #Submit the last form;
-          def self.submit(index=nil, type=nil)            
+          def self.submit(index=nil, sleep_time=nil, type=nil)
             Scrubyt.log :ACTION, 'Submitting form...'
             if index == nil
               result_page = @@agent.submit(@@current_form)
@@ -86,7 +86,7 @@ module Scrubyt
 
           ##
           #Click the link specified by the text
-          def self.click_link(link_spec,index = 0)
+          def self.click_link(link_spec,index = 0,wait_secs=0)
             Scrubyt.log :ACTION, "Clicking link specified by: %p" % link_spec
             if link_spec.is_a? Hash
               clicked_elem = CompoundExampleLookup.find_node_from_compund_example(@@hpricot_doc, link_spec, false, index)
@@ -172,7 +172,7 @@ module Scrubyt
             end
           end
         
-          def self.fill_textfield(textfield_name, query_string)
+          def self.fill_textfield(textfield_name, query_string, *unused)
             lookup_form_for_tag('input','textfield',textfield_name,query_string)
             eval("@@current_form['#{textfield_name}'] = '#{query_string}'")
           end
