@@ -5,6 +5,7 @@
 
 =<tt>changes:</tt>
 - [NEW] possibility to use FireWatir as the agent for scraping (credit: Glenn Gillen, Glen Gillen and... did I mention Glenn already?)
+- [FIX] navigation doesn't crash if a 404/500 is returned (credit: Glen Gillen)
 - [NEW] navigation action: click_by_xpath to click arbitrary elements
 - [MOD] dropped dependencies: RubyInline, ParseTree, Ruby2Ruby (hooray for win32 users)
 - [NEW] scraping through frames (e.g. google analytics)
