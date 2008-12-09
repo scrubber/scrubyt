@@ -32,16 +32,21 @@ module Scrubyt
 
             if args.size > 0
               mechanize_doc = args[0][:mechanize_doc]
+              html = args[0][:html]
               resolve = args[0][:resolve]
               basic_auth = args[0][:basic_auth]
               parse_and_set_basic_auth(basic_auth) if basic_auth
+              if html
+                @@current_doc_protocol = 'string'
+                mechanize_doc = page = WWW::Mechanize::Page.new(nil, {'content-type' => 'text/html'}, html) 
+              end
             else
               mechanize_doc = nil
               resolve = :full
             end
 
             @@current_doc_url = doc_url
-            @@current_doc_protocol = determine_protocol
+            @@current_doc_protocol ||= determine_protocol
 
             if mechanize_doc.nil? && @@current_doc_protocol != 'file'
               handle_relative_path(doc_url)
@@ -59,7 +64,7 @@ module Scrubyt
               @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(open(@@current_doc_url).read))
             else
               @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc.body))
-              store_host_name(self.get_current_doc_url)   # in case we're on a new host
+              store_host_name(self.get_current_doc_url) if self.get_current_doc_url   # in case we're on a new host
             end
           end
 
