@@ -17,7 +17,7 @@ task "cleanup_readme" => ["rdoc"]
 
 gem_spec = Gem::Specification.new do |s|
   s.name = 'scrubyt'
-  s.version = '0.4.10'
+  s.version = '0.4.1'
   s.summary = 'A powerful Web-scraping framework built on Mechanize and Hpricot (and FireWatir)'
   s.description = %{scRUBYt! is an easy to learn and use, yet powerful and effective web scraping framework. It's most interesting part is a Web-scraping DSL built on HPricot and WWW::Mechanize, which allows to navigate to the page of interest, then extract and query data records with a few lines of code. It is hard to describe scRUBYt! in a few sentences - you have to see it for yourself!}
   # Files containing Test::Unit test cases.
