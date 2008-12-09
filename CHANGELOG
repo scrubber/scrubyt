@@ -4,11 +4,16 @@
 == 20th October
 
 =<tt>changes:</tt>
-- [NEW] possibility to use FireWatir as the agent for scraping
-- [NEW] navigation actions: click_by_xpath, click_link_and_wait
+- [NEW] possibility to use FireWatir as the agent for scraping (credit: Glenn Gillen, Glen Gillen and... did I mention Glenn already?)
+- [NEW] navigation action: click_by_xpath to click arbitrary elements
 - [MOD] dropped dependencies: RubyInline, ParseTree, Ruby2Ruby (hooray for win32 users)
+- [NEW] scraping through frames (e.g. google analytics)
 - [MOD] exporting temporarily doesn't work - for now, generated XPaths are printed to the screen
+- [MOD] possibility to wait after clicking link/filling textfield (to be able to scrape inserted AJAX stuff)
+- [NEW] possibility to fetch from a string, by specifying nil as the url and the html string with the :html option 
+- [FIX] firewatir slowness (credit: jak4)
 - [FIX] lot of bugfixes and stability fixes
+- 
 
 == 0.4.0 (unofficial)
 === 31st October, 2007
@@ -16,13 +21,13 @@
 =<tt>changes:</tt>
 - [NEW] possibility to define a default value for patterns
 - [MOD] rewrite of to_flat_xml to a more robust algorithm
-- [NEW] find_string method in text pattern; return the string if it's present         in the input
+- [NEW] find_string method in text pattern; return the string if it's present in the input
 
 == 0.3.4
 === 26th September, 2007
 
 =<tt>changes:</tt>
-
+It seems I have been too busy to update the changelog ;)
 
 
 == 0.3.1
