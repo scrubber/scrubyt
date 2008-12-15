@@ -16,12 +16,14 @@ describe "Extractor" do
 		
 		it "should store passed in arguments as options" do
 			do_extractor(:agent => :ajax, :output => :xml) 
-			@extractor.options.should == { :agent => :ajax, :output => :xml, :child => true }
+			@extractor.options[:agent].should == :ajax
+			@extractor.options[:output].should == :xml
 		end
 
 		it "should default options if none are passed" do
 			do_extractor
-			@extractor.options.should == { :agent => :standard, :output => :hash, :child => true }
+			@extractor.options[:agent].should == :standard
+			@extractor.options[:output].should == :hash
 		end
 
 		it "should accept a block as a second parameter" do
@@ -51,9 +53,11 @@ describe "Extractor" do
 			end
 			
 			it "should be able to log output" do
+			  mock_mechanize
 			  logger = mock("logger")
 			  logger.should_receive(:log)
 				@extractor = Skimr::Extractor.new(:log => logger) do
+				  fetch "http://www.google.com"
 				end
 			end
 		end
@@ -81,8 +85,8 @@ describe "Extractor" do
 			describe "and navigating to a subsequent page" do
 			  
 			  it "should limit the rate results are retrieved" do
-          Skimr::Extractor.should_receive(:sleep).with(0).exactly(2).times
-          @extractor = Skimr::Extractor.new(:agent => :standard) do
+          @extractor = Skimr::Extractor.new(:agent => :standard, :rate_limit => 2) do
+            self.should_receive(:sleep).with(2).exactly(2).times
             fetch "http://www.google.com"
             fetch "http://www.yahoo.com"
           end
@@ -192,8 +196,16 @@ describe "Extractor" do
   				end
 				end
 				
+				it "should be able to submit a form by name" do
+				  mock_mechanize
+		  	  @form.should_receive(:name).and_return("form_one")
+					@extractor = Skimr::Extractor.new(:agent => :standard) do
+  					fetch "http://www.google.com/"
+  					submit :form_name => "form_one"
+  				end
+				end
+				
 				it "should submit the first form on the page by default" do
-				  @forms.should_receive(:first).at_least(:once).and_return(@form)
 				  @mechanize_agent.should_receive(:submit).with(@form, anything()).and_return(@mechanize_page)
 					@extractor = Skimr::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
@@ -209,6 +221,10 @@ describe "Extractor" do
   					fetch "http://www.google.com/"
   					fill_textfield "q", "example text"
   				end
+				end
+				
+				it "should be able to fill in a text field within a named form" do
+				  pending
 				end
 				
 				it "should select a drop down option" do
@@ -421,10 +437,10 @@ describe "Extractor" do
   			       }])
 		  end
 		  
-		  it "should concatenate multiple elements if requested " do
+		  it "should concatenate multiple elements if requested" do
 		    @extractor = Skimr::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-  				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a/*" do
+  				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
   				  list_price "//td[@class='listprice']"
   				end

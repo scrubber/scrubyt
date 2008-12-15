@@ -38,7 +38,7 @@ module Skimr
       def log(event, output = nil)
         @log.log(event, output) if @log
       end
-    
+      
       def method_missing(method_name, *args, &block)
         return fetch_next(method_name, *args, &block) if next_page?(method_name)
         return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)
@@ -139,7 +139,7 @@ module Skimr
       end
     
       def fetch(url)
-        sleep(0)
+        sleep(@options[:rate_limit]) if @options[:rate_limit]
         full_url = resolve_url(url)
         log("fetch", full_url)
         @agent_doc = @agent.get(full_url)
@@ -205,8 +205,15 @@ module Skimr
         end
       end
       
-      def submit(button_name = nil)
+      def submit(*args)
         log("submit")
+        if args.last.is_a?(Hash)
+          form_name = args.last[:form_name]
+        end
+        if args.first.is_a?(String)
+          button_name = args.first
+        end
+        find_form(form_name) if form_name
         current_form.action = resolve_url(current_form.action)
         button = current_form.buttons.detect{|b| b.value == "Submit"} if button_name
         @agent_doc = @agent.submit(current_form, button)
@@ -215,15 +222,15 @@ module Skimr
         @parsed_doc = nil
       end
       
-      def fill_textfield(field_name, value)
+      def fill_textfield(field_name, value, options ={})
         log("form_textfield", "#{field_name}: #{value}") if @options[:log_level] == :debug
-        @current_form, field = find_form_element(field_name)
+        @current_form, field = find_form_element(field_name, options)
         field.value = value
       end
       
-      def select_option(field_name, option_text)
+      def select_option(field_name, option_text, options ={})
         log("form_select_option", "#{field_name}: #{option_text}") if @options[:log_level] == :debug
-        @current_form, field = find_form_element(field_name)
+        @current_form, field = find_form_element(field_name, options)
         find_select_option(field, option_text).select
       end
       
@@ -231,12 +238,10 @@ module Skimr
         select.options.detect{|o| o.text == option_text}
       end
       
-      def find_form_element(field_name)
+      def find_form_element(field_name, options)
         @agent_doc.forms.map do |form|  
-          if form.name == "lettings"
-            false
-          elsif form.field(field_name)
-            [form, form.field(field_name)]
+          if field = form.field(field_name)
+            [form, field]
           else
             false
           end
@@ -287,10 +292,13 @@ module Skimr
         @previous_path = url.match(%r{.*/})[0]
       end
       
+      def find_form(form_name)
+        @current_form = @agent_doc.forms.detect{|f| f.name == form_name }
+      end
+      
       def current_form
         return @current_form unless @current_form.nil?
-        forms = @agent_doc.forms.map{|f| f unless f.name == "lettings"}
-        @current_form = forms.detect{|f| f}
+        @current_form = @agent_doc.forms.detect{|f| f}
       end
       
       def parsed_doc
