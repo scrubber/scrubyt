@@ -41,14 +41,18 @@ module Skimr
       
       def method_missing(method_name, *args, &block)
         return fetch_next(method_name, *args, &block) if next_page?(method_name)
-        return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)
+        return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)        
         return @results << extract_detail(method_name, *args, &block) if result_block?(&block)
-        return save_result(:current_url, previous_url) if wants_current_url?(method_name)
-        return save_result(method_name, extract_result(method_name, *args)) if result_node?(method_name, *args)
-        return save_result(method_name, extract_result(method_name, *args)) if result_set?(method_name, *args)
-        super
+        return mandatory_failure! if missing_mandatory_results?(method_name, *args)
+        unless mandatory_failure?
+          return save_result(:current_url, previous_url) if wants_current_url?(method_name)
+          return if drop_empty_result?(method_name, *args)
+          return save_result(method_name, extract_result(method_name, *args)) if result_node?(method_name, *args)
+          return save_result(method_name, extract_result(method_name, *args)) if result_set?(method_name, *args)
+          super
+        end
       end
-      
+            
       def save_result(name, result)
         log("save_result", "#{name}: #{result}") if @options[:log_level] == :debug        
         if @options[:file]
@@ -88,16 +92,47 @@ module Skimr
         method_name == :current_url
       end
       
+      def missing_mandatory_results?(method_name, *args)
+        ## TODO: Look at refactoring to make this an instance variable
+        ## or memoized attribute to improve performance
+        ## extract_result should only need to be called once, it is currently
+        ## called >= 3 times
+        
+        if !args.empty? && (args.first.match(%r{//}) || args.first == "current_url")
+          result = extract_result(method_name, *args)
+          return result.compact.empty? && args.last[:required]
+        end
+      end
+
+      def drop_empty_result?(method_name, *args)
+        ## TODO: Look at refactoring to make this an instance variable
+        ## or memoized attribute to improve performance
+        ## extract_result should only need to be called once, it is currently
+        ## called >= 3 times
+        if !args.empty? && args.first.match(%r{//}) || args.first == "current_url"
+          result = extract_result(method_name, *args)
+          return result.compact.empty? && args.last[:remove_blank]
+        end
+      end
+      
       def result_node?(method_name, *args)
+        ## TODO: Look at refactoring to make this an instance variable
+        ## or memoized attribute to improve performance
+        ## extract_result should only need to be called once, it is currently
+        ## called >= 3 times        
         if args.first.match(%r{//}) || args.first == "current_url"
-          if extract_result(method_name, *args).size < 2
-            return true 
-          end
+          result = extract_result(method_name, *args)
+          return true if result.size < 2
         end
       end
       
       def result_set?(method_name, *args)
-        return true if args.first.match(%r{//}) && extract_result(method_name, *args).size > 1
+        ## TODO: Look at refactoring to make this an instance variable
+        ## or memoized attribute to improve performance
+        ## extract_result should only need to be called once, it is currently
+        ## called >= 3 times
+        result = extract_result(method_name, *args)
+        return true if args.first.match(%r{//}) && result.size > 1
       end
       
       def extract_result(result_name, locator, options = {})
@@ -133,9 +168,15 @@ module Skimr
             end
           end
         end
+        ## Deals with XPath not always matching nth child properly. Look into
+        ## A better solution
         return [results.first] if locator.match(%r{\[1\]$})
+        ## Shortcut to return the last sibling element 
         return [results.last] if locator.match(%r{\[-1\]$})
+        ## Return a limited resultset
         return results[0...options[:limit]] if options[:limit]
+        ## Return only non-nil/empty results. Look at porting rails #blank?
+        return results.compact.reject{|r| r == ""} if options[:required]
         results
       end
     
@@ -149,9 +190,9 @@ module Skimr
       rescue EOFError
       end
       
-      def fetch_next(result_name, *args, &block)
-        
+      def fetch_next(result_name, *args, &block)        
         #TODO: Refactor the commonality between this and extract_result & fetch
+        reset_mandatory_failure!
         locator = args.shift
         locator.gsub!("/tbody","")
         options = args.first || {}
@@ -178,9 +219,11 @@ module Skimr
       
       def fetch_detail(result_name, *args, &block)
         #TODO: Refactor the commonality between this and extract_result & fetch
+        reset_mandatory_failure!
         locator = args.shift
         locator.gsub!("/tbody","")
         attribute = args.first && args.first[:attribute] ? args.first[:attribute] : :href
+        all_required = args.first && args.first[:required] == :all
         parsed_doc.search(locator).each do |element|
           url = attribute == :text ? element.inner_text : element.get_attribute(attribute.to_s)
           full_url = resolve_url(url)
@@ -188,7 +231,12 @@ module Skimr
           if @options[:file]
             @options[:file].write "<#{result_name.to_s}>"
           end
-          @results << { result_name => Extractor.new(@options.merge(:url => full_url), &block).results }
+          detail_result = Extractor.new(@options.merge(:url => full_url), &block).results
+          ## TODO: Refactor into a more obviously named method to handle
+          ## Determining whether results should be returned or not
+          unless detail_result.empty? || (all_required && detail_result.reject!{|result| result.reject!{|k,v| v.nil?}})
+            @results << { result_name => detail_result } 
+          end
           if @options[:file]
             #TODO: Check if you need this
             # @options[:file].write @results.to_xml
@@ -322,6 +370,19 @@ module Skimr
         elsif @options[:body]
           @parsed_doc = Hpricot(@options[:body])
         end
+      end
+      
+      def reset_mandatory_failure!
+        @mandatory_failure = false
+      end
+      
+      def mandatory_failure!
+        @results = []
+        @mandatory_failure = true
+      end
+      
+      def mandatory_failure?
+        @mandatory_failure ||= false
       end
     
   end
