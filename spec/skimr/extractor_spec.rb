@@ -470,11 +470,10 @@ describe "Extractor" do
 		    @extractor = Skimr::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
-  				  book_title "//h1"
+  				  book_title "//h1", :script => Proc.new{|r| "put a test here that only works some of the time"}
   				  summary "//p"
   				end
   			end
-  			require 'ruby-debug'; debugger
         pending
 		  end
 		  
