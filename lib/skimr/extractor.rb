@@ -14,20 +14,20 @@ module Skimr
                    :log_level => :info }
       @options = defaults.merge(options)
       setup_agent
-      @results = []
+      clear_results!
       @detail = {}
       @detail_definition = []
       @log = @options[:log]
+      log("initialized_extractor") unless options[:child]
       if @options[:file] && !options[:child]
-        log("initialized_extractor")
         @options[:file].write "<root>"
       end
       instance_eval(&extractor_definition)
       if @options[:file] && !options[:child]
         @options[:file].write "</root>"
-        log("finished_extractor")
-        @results = []
+        clear_results!
       end
+      log("finished_extractor") unless options[:child]
     end
     
     def results
@@ -43,8 +43,8 @@ module Skimr
         return fetch_next(method_name, *args, &block) if next_page?(method_name)
         return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)        
         return @results << extract_detail(method_name, *args, &block) if result_block?(&block)
-        return mandatory_failure! if missing_mandatory_results?(method_name, *args)
-        unless mandatory_failure?
+        return required_failure! if missing_required_results?(method_name, *args)
+        unless required_failure?
           return save_result(:current_url, previous_url) if wants_current_url?(method_name)
           return if drop_empty_result?(method_name, *args)
           return save_result(method_name, extract_result(method_name, *args)) if result_node?(method_name, *args)
@@ -93,7 +93,7 @@ module Skimr
         method_name == :current_url
       end
       
-      def missing_mandatory_results?(method_name, *args)
+      def missing_required_results?(method_name, *args)
         if has_result_definition?(*args)
           result = extract_result(method_name, *args)
           return result.compact.empty? && args.last[:required]
@@ -121,8 +121,6 @@ module Skimr
       
       def extract_result(result_name, locator, options = {})
         return @current_result if @current_result  
-        locator.gsub!("/tbody","")
-        attribute = options[:attribute] || :text
         results = []
         if locator == "current_url"
           results << process_proc(previous_url, options[:script])
@@ -131,7 +129,7 @@ module Skimr
           matching_elements = parsed_doc.search(locator)
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
-            result = get_value(element, attribute)
+            result = get_value(element, attribute(options, :text))
             results << process_proc(result, options[:script])
           end
         end
@@ -159,22 +157,19 @@ module Skimr
       
       def fetch_next(result_name, *args, &block)        
         #TODO: Refactor the commonality between this and extract_result & fetch
-        reset_mandatory_failure!
+        reset_required_failure!
         clear_current_result!
         locator = args.shift
-        locator.gsub!("/tbody","")
         options = args.first || {}
         options[:limit] ||= 500
-        attribute = options[:attribute] || :href
         options[:limit].times do
           link = parsed_doc.search(locator).first
           if link
-            url = get_value(link, attribute)
+            url = get_value(link, attribute(options))
             url = process_proc(url,options[:script])
             log("fetch_next_page", url)
             fetch(url)
-            @parsed_doc = nil
-            @current_form = nil
+            reset_page_state!
             fetch_detail(@detail_definition[0], *@detail_definition[1], &@detail_definition[2])  
           end
         end        
@@ -184,57 +179,52 @@ module Skimr
       
       def fetch_detail(result_name, *args, &block)
         #TODO: Refactor the commonality between this and extract_result & fetch
-        reset_mandatory_failure!
+        reset_required_failure!
         clear_current_result!
         locator = args.shift
-        locator.gsub!("/tbody","")
-        attribute = args.first && args.first[:attribute] ? args.first[:attribute] : :href
         all_required = args.first && args.first[:required] == :all
         parsed_doc.search(locator).each do |element|
-          url = get_value(element, attribute)
+          url = get_value(element, attribute(args))
           full_url = resolve_url(url)
-          result_name = result_name.to_s.gsub(/_detail$/,"").to_sym          
+          result_name = result_name.to_s.gsub(/_detail$/,"").to_sym
           if @options[:file]
             @options[:file].write "<#{result_name.to_s}>"
           end
           detail_result = Extractor.new(@options.merge(:url => full_url), &block).results
-          ## TODO: Refactor into a more obviously named method to handle
-          ## Determining whether results should be returned or not
-          unless detail_result.empty? || (all_required && detail_result.reject!{|result| result.reject!{|k,v| v.nil?}})
+          if should_return_result?(detail_result, all_required)
             @results << { result_name => detail_result } 
           end
           if @options[:file]
-            #TODO: Check if you need this
-            # @options[:file].write @results.to_xml
             @options[:file].write "</#{result_name.to_s}>"
-            @results = []
+            clear_results!
           end
         end        
       end
       
       def extract_detail(result_name, *args, &block)
         locator = args.flatten.shift
-        locator.gsub!("/tbody","")
-        testing = parsed_doc.search(locator).map do |element|
+        parsed_doc.search(locator).map do |element|
           { result_name => Extractor.new(@options.merge(:body => element.to_s), &block).results }
         end
       end
       
       def submit(*args)
         log("submit")
+        ## TODO: Needs better structure and readability
         if args.last.is_a?(Hash)
           form_name = args.last[:form_name]
         end
         if args.first.is_a?(String)
           button_name = args.first
         end
+        ## TODO: make it clearer why we are finding form
         find_form(form_name) if form_name
-        current_form.action = resolve_url(current_form.action)
+        fix_form_action
+        ## TODO: make it clearer why we are finding a button
         button = current_form.buttons.detect{|b| b.value == "Submit"} if button_name
         @agent_doc = @agent.submit(current_form, button)
         store_url_helpers(@agent_doc.uri.to_s)
-        @current_form = nil
-        @parsed_doc = nil
+        reset_page_state!
       end
       
       def fill_textfield(field_name, value, options ={})
@@ -255,6 +245,7 @@ module Skimr
       
       def find_form_element(field_name, options)
         @agent_doc.forms.map do |form|
+          ## TODO: Make it clearer why we are trying to skip next early
           next if !options[:form].nil? && form.name != options[:form]
           if field = form.field(field_name)
             [form, field]
@@ -265,12 +256,15 @@ module Skimr
       end
       
       def resolve_url(url)
+        ## TODO: See if we can pass the when clauses into methods
+        ## to make it more descriptive of intention
         case url
         when %r{^http[s]*:}
           return url
         when %r{^/}
           return previous_base_path + url
         when %r{^\.}
+          ## TODO: What the hell is this equality match checking? More desc
           if previous_base_path.sub(%r{/$},"") == previous_path.sub(%r{/$},"")
             return previous_base_path + url.sub(%r{^(../)*}, "/")
           end
@@ -289,6 +283,7 @@ module Skimr
         url.split("&").each do |param|
           if !param.empty?
             key, value = param.split("=")
+            ## TODO: What are we trying to match here? When do we end in the else?
             if new_querystring.match(%r{#{key}=[^&]*})
               new_querystring.gsub!(%r{#{key}=[^&]*},"#{key}=#{value}")
             else
@@ -303,6 +298,7 @@ module Skimr
         @previous_url = url
         @previous_page = url.match(/[^\?]*/)[0]
         @previous_query = nil
+        # TODO: If URL match that why?
         @previous_query = url.match(/\?(.*)/)[1] if url.match(/\?(.*)/)
         @previous_base_path = url.match(%r{.*://[^/]*})[0]
         @previous_path = url.match(%r{.*/})[0]
@@ -331,6 +327,7 @@ module Skimr
           Hpricot.buffer_size = 262144
           @agent = WWW::Mechanize.new
         end
+        ## TODO: Clearer distinction between requesting url and processing body for detail
         if @options[:url]
           fetch(@options[:url]) 
         elsif @options[:body]
@@ -338,17 +335,17 @@ module Skimr
         end
       end
       
-      def reset_mandatory_failure!
-        @mandatory_failure = false
+      def reset_required_failure!
+        @required_failure = false
       end
       
-      def mandatory_failure!
-        @results = []
-        @mandatory_failure = true
+      def required_failure!
+        clear_results!
+        @required_failure = true
       end
       
-      def mandatory_failure?
-        @mandatory_failure ||= false
+      def required_failure?
+        @required_failure ||= false
       end
             
       def clear_current_result!
@@ -377,6 +374,32 @@ module Skimr
       
       def get_value(element, attribute)
         attribute == :text ? element.inner_text : element.get_attribute(attribute.to_s)
+      end
+      
+      def attribute(options, default = :href)
+        options = options.first if options.is_a?(Array)
+        return default if options.nil? || options.empty?        
+        options[:attribute] || default
+      end
+      
+      def should_return_result?(result, all_required)
+        return false if result.empty?
+        ## TODO: Consider making a missing_a_result?()
+        return false if (all_required && result.reject!{|fields| fields.reject!{|k,v| v.nil?}})
+        true
+      end
+      
+      def fix_form_action
+        current_form.action = resolve_url(current_form.action)
+      end
+      
+      def reset_page_state!
+        @current_form = nil
+        @parsed_doc = nil
+      end
+      
+      def clear_results!
+        @results = []
       end
   end
 end

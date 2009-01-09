@@ -55,7 +55,7 @@ describe "Extractor" do
 			it "should be able to log output" do
 			  mock_mechanize
 			  logger = mock("logger")
-			  logger.should_receive(:log)
+			  logger.should_receive(:log).at_least(:once)
 				@extractor = Skimr::Extractor.new(:log => logger) do
 				  fetch "http://www.google.com"
 				end
@@ -355,14 +355,6 @@ describe "Extractor" do
     			@extractor.results.should include(:result => "!Test!Ruby Programming Language!Test!")
     			@extractor.results.should include(:result => "!Test!Ruby Home Page - What's Ruby!Test!")
     	  end
-    	  
-    	  it "should strip out any /tbody tag (Firebug adds them in when you copy&paste)" do
-    	    @extractor = Skimr::Extractor.new do
-    				fetch "http://www.google.com/search?&q=ruby"
-    				result "//html/body/div[5]/div/div/h2/tbody/a", :attribute => :href
-    			end
-    			@extractor.results.should include(:result => "http://www.ruby-lang.org/")
-    	  end   
     	  
     	  it "should return multiple values within an example" do
     	    @extractor = Skimr::Extractor.new do
