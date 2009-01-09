@@ -71,6 +71,7 @@ module Skimr
             @results.first[name] = result
           end
         end
+        clear_current_result!
       end
       
       def next_page?(method_name)
@@ -93,91 +94,57 @@ module Skimr
       end
       
       def missing_mandatory_results?(method_name, *args)
-        ## TODO: Look at refactoring to make this an instance variable
-        ## or memoized attribute to improve performance
-        ## extract_result should only need to be called once, it is currently
-        ## called >= 3 times
-        
-        if !args.empty? && (args.first.match(%r{//}) || args.first == "current_url")
+        if has_result_definition?(*args)
           result = extract_result(method_name, *args)
           return result.compact.empty? && args.last[:required]
         end
       end
 
       def drop_empty_result?(method_name, *args)
-        ## TODO: Look at refactoring to make this an instance variable
-        ## or memoized attribute to improve performance
-        ## extract_result should only need to be called once, it is currently
-        ## called >= 3 times
-        if !args.empty? && args.first.match(%r{//}) || args.first == "current_url"
+        if has_result_definition?(*args)
           result = extract_result(method_name, *args)
           return result.compact.empty? && args.last[:remove_blank]
         end
       end
       
       def result_node?(method_name, *args)
-        ## TODO: Look at refactoring to make this an instance variable
-        ## or memoized attribute to improve performance
-        ## extract_result should only need to be called once, it is currently
-        ## called >= 3 times        
-        if args.first.match(%r{//}) || args.first == "current_url"
+        if has_result_definition?(*args)
           result = extract_result(method_name, *args)
           return true if result.size < 2
         end
       end
       
       def result_set?(method_name, *args)
-        ## TODO: Look at refactoring to make this an instance variable
-        ## or memoized attribute to improve performance
-        ## extract_result should only need to be called once, it is currently
-        ## called >= 3 times
         result = extract_result(method_name, *args)
-        return true if args.first.match(%r{//}) && result.size > 1
+        return true if has_result_definition?(*args) && result.size > 1
       end
       
       def extract_result(result_name, locator, options = {})
+        return @current_result if @current_result  
         locator.gsub!("/tbody","")
         attribute = options[:attribute] || :text
         results = []
         if locator == "current_url"
-          begin
-            results << options[:script].call(previous_url)
-          rescue
-          end
+          results << process_proc(previous_url, options[:script])
           return results
-        elsif locator.match(%r{/\*$})
-          result = parsed_doc.search(locator).to_s
-          if options[:script]          
-            begin
-              results << options[:script].call(result)
-            rescue
-            end
-          else
-            results << result
-          end
-        else
-          parsed_doc.search(locator).each do |element|
-            result = attribute == :text ? element.inner_text : element.get_attribute(attribute.to_s)
-            if options[:script]          
-              begin
-                results << result = options[:script].call(result)
-              rescue
-              end
-            else
-              results << result
-            end
+        else 
+          matching_elements = parsed_doc.search(locator)
+          return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
+          matching_elements.each do |element|
+            result = get_value(element, attribute)
+            results << process_proc(result, options[:script])
           end
         end
         ## Deals with XPath not always matching nth child properly. Look into
         ## A better solution
-        return [results.first] if locator.match(%r{\[1\]$})
+        return @current_result = [results.first] if locator.match(%r{\[1\]$})
         ## Shortcut to return the last sibling element 
-        return [results.last] if locator.match(%r{\[-1\]$})
+        return @current_result = [results.last] if locator.match(%r{\[-1\]$})
         ## Return a limited resultset
-        return results[0...options[:limit]] if options[:limit]
+        return @current_result = results[0...options[:limit]] if options[:limit]
         ## Return only non-nil/empty results. Look at porting rails #blank?
-        return results.compact.reject{|r| r == ""} if options[:required]
-        results
+        return @current_result = results.compact.reject{|r| r == ""} if options[:required]
+        @current_result = results
       end
     
       def fetch(url)
@@ -193,6 +160,7 @@ module Skimr
       def fetch_next(result_name, *args, &block)        
         #TODO: Refactor the commonality between this and extract_result & fetch
         reset_mandatory_failure!
+        clear_current_result!
         locator = args.shift
         locator.gsub!("/tbody","")
         options = args.first || {}
@@ -201,11 +169,8 @@ module Skimr
         options[:limit].times do
           link = parsed_doc.search(locator).first
           if link
-            url = attribute == :text ? link.inner_text : link.get_attribute(attribute.to_s)
-            begin
-              url = options[:script].call(url) if options[:script]
-            rescue
-            end
+            url = get_value(link, attribute)
+            url = process_proc(url,options[:script])
             log("fetch_next_page", url)
             fetch(url)
             @parsed_doc = nil
@@ -220,12 +185,13 @@ module Skimr
       def fetch_detail(result_name, *args, &block)
         #TODO: Refactor the commonality between this and extract_result & fetch
         reset_mandatory_failure!
+        clear_current_result!
         locator = args.shift
         locator.gsub!("/tbody","")
         attribute = args.first && args.first[:attribute] ? args.first[:attribute] : :href
         all_required = args.first && args.first[:required] == :all
         parsed_doc.search(locator).each do |element|
-          url = attribute == :text ? element.inner_text : element.get_attribute(attribute.to_s)
+          url = get_value(element, attribute)
           full_url = resolve_url(url)
           result_name = result_name.to_s.gsub(/_detail$/,"").to_sym          
           if @options[:file]
@@ -384,6 +350,33 @@ module Skimr
       def mandatory_failure?
         @mandatory_failure ||= false
       end
-    
+            
+      def clear_current_result!
+        @current_result = nil
+      end
+      
+      def has_result_definition?(*args)
+        !args.empty? && (args.first.match(%r{//}) || args.first == "current_url")
+      end
+      
+      def process_proc(string_input, proc)
+        begin
+          string_input = proc.call(string_input) if proc
+        rescue
+        end
+        string_input
+      end
+      
+      def merge_elements?(locator)
+        locator.match(%r{/\*$})
+      end
+      
+      def merge_results(results, proc)
+        process_proc(results.to_s, options[:script])
+      end
+      
+      def get_value(element, attribute)
+        attribute == :text ? element.inner_text : element.get_attribute(attribute.to_s)
+      end
   end
 end
