@@ -22,6 +22,15 @@ module MockFactory
     @mechanize_page.stub!(:body).and_return(File.open(test_file, "r").read)
 	end
 	
+	def mock_named_form
+	  @field = mock("field")	  
+	  @form.should_receive(:name).and_return("named_form")
+	  @form.should_receive(:field).with("q").and_return(@field)
+    # field = mock("field")
+    # @form.should_receive(:field).with("q").at_least(:once).and_return(field)
+    # field.should_receive(:value=).with("example text")
+	end
+	
 	def mock_amazon_results
 	  mock_mechanize
     results = "#{File.dirname(__FILE__)}/../mocks/amazon_results"

@@ -50,7 +50,7 @@ module Skimr
       end
       
       def save_result(name, result)
-        log("save_result", "#{name}: #{result}") if @options[:log_level] == :debug
+        log("save_result", "#{name}: #{result}") if @options[:log_level] == :debug        
         if @options[:file]
           result.each do |r| 
             xml_node = REXML::Element.new name.to_s
@@ -135,6 +135,7 @@ module Skimr
         end
         return [results.first] if locator.match(%r{\[1\]$})
         return [results.last] if locator.match(%r{\[-1\]$})
+        return results[0...options[:limit]] if options[:limit]
         results
       end
     
@@ -239,7 +240,8 @@ module Skimr
       end
       
       def find_form_element(field_name, options)
-        @agent_doc.forms.map do |form|  
+        @agent_doc.forms.map do |form|
+          next if !options[:form].nil? && form.name != options[:form]
           if field = form.field(field_name)
             [form, field]
           else

@@ -224,7 +224,13 @@ describe "Extractor" do
 				end
 				
 				it "should be able to fill in a text field within a named form" do
-				  pending
+				  mock_named_form
+				  @field.should_receive(:value=).with("example text")
+				  @extractor = Skimr::Extractor.new(:agent => :standard) do
+  					fetch "http://www.google.com/"
+  					fill_textfield "q", "example text", :form => "named_form"
+  					submit
+  				end
 				end
 				
 				it "should select a drop down option" do
@@ -447,6 +453,51 @@ describe "Extractor" do
   			end
         pending
 		  end
+		  
+		  it "should be able to limit the number of results in a given level/detail" do
+		    @extractor = Skimr::Extractor.new do
+  				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+  				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
+  				  book_title "//h1"
+  				  summary "//p", :limit => 2
+  				end
+  			end
+  			summaries = @extractor.results.first[:result].select{|r| r.has_key?(:summary)}
+        summaries.size.should == 2
+		  end
+		  
+		  it "should be able to not return any result if match is empty or nil" do
+		    @extractor = Skimr::Extractor.new do
+  				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+  				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
+  				  book_title "//h1", :script => Proc.new{|r| "put a test here that only works some of the time"}
+  				  summary "//p"
+  				end
+  			end
+        pending
+		  end
+		  
+		  it "should be able to specify certain fields are mandatory" do
+		    @extractor = Skimr::Extractor.new do
+  				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+  				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
+  				  book_title "//h1"
+  				  summary "//p", :script => Proc.new{|r| "put a test here that only works some of the time"}, :required => true
+  				end
+  			end
+  			pending
+		  end
+		  
+		  it "should be able to specify that all fields are mandatory" do
+		    @extractor = Skimr::Extractor.new do
+  				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+  				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a", :required => :all do
+  				  book_title "//h1"
+  				  summary "//p", :script => Proc.new{|r| "put a test here that only works some of the time"}
+  				end
+  			end
+  			pending
+		  end
 		  			
 			it "should return results from next pages" do
         @extractor = Skimr::Extractor.new do
@@ -515,6 +566,26 @@ describe "Extractor" do
   			end
       end
       
+    end
+
+    describe "to a model" do
+      it "should not store any results in memory" do
+        # do_extractor
+        # @extractor.results.should be_empty
+  			pending
+      end
+      
+      it "should save results to model as processed" do
+        pending
+      end
+            
+      it "should nest models" do
+        pending
+      end
+      
+      it "should be able to specify additional attributes to merge in" do
+        
+      end
     end
 	end
 	
