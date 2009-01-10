@@ -156,7 +156,6 @@ module Skimr
       end
       
       def fetch_next(result_name, *args, &block)        
-        #TODO: Refactor the commonality between this and extract_result & fetch
         reset_required_failure!
         clear_current_result!
         locator = args.shift
@@ -178,7 +177,6 @@ module Skimr
       end
       
       def fetch_detail(result_name, *args, &block)
-        #TODO: Refactor the commonality between this and extract_result & fetch
         reset_required_failure!
         clear_current_result!
         locator = args.shift
@@ -210,21 +208,34 @@ module Skimr
       
       def submit(*args)
         log("submit")
-        ## TODO: Needs better structure and readability
-        if args.last.is_a?(Hash)
-          form_name = args.last[:form_name]
-        end
-        if args.first.is_a?(String)
-          button_name = args.first
-        end
-        ## TODO: make it clearer why we are finding form
-        find_form(form_name) if form_name
+        find_form(form_name(args)) if supplied_form_name?(args)
         fix_form_action
-        ## TODO: make it clearer why we are finding a button
-        button = current_form.buttons.detect{|b| b.value == "Submit"} if button_name
-        @agent_doc = @agent.submit(current_form, button)
+        @agent_doc = @agent.submit(current_form, find_button(args))
         store_url_helpers(@agent_doc.uri.to_s)
         reset_page_state!
+      end
+      
+      def form_name(options)        
+        options.last[:form_name] if supplied_form_name?(options)  
+      end
+      
+      def supplied_form_name?(options)
+        options.is_a?(Array) && options.last.is_a?(Hash)
+      end
+      
+      def supplied_button_name?(options)
+        options.first.is_a?(String)
+      end
+      
+      def button_name(options)
+        options.first if supplied_button_name?(options)
+      end
+      
+      def find_button(options)
+        if supplied_button_name?(options)
+          button = button(options)
+          current_form.buttons.detect{|b| b.value == button}
+        end
       end
       
       def fill_textfield(field_name, value, options ={})
@@ -244,33 +255,30 @@ module Skimr
       end
       
       def find_form_element(field_name, options)
-        @agent_doc.forms.map do |form|
-          ## TODO: Make it clearer why we are trying to skip next early
-          next if !options[:form].nil? && form.name != options[:form]
+        fields = @agent_doc.forms.map do |form|
+          next if not_our_form?(form, options[:form])
           if field = form.field(field_name)
             [form, field]
-          else
-            false
           end
-        end.detect{|x| x }
+        end
+        fields.compact!
+        fields.first
       end
       
+      def not_our_form?(form, form_name = nil)
+        !form_name.nil? && form.name != form_name
+      end
+            
       def resolve_url(url)
-        ## TODO: See if we can pass the when clauses into methods
-        ## to make it more descriptive of intention
         case url
         when %r{^http[s]*:}
           return url
         when %r{^/}
           return previous_base_path + url
         when %r{^\.}
-          ## TODO: What the hell is this equality match checking? More desc
-          if previous_base_path.sub(%r{/$},"") == previous_path.sub(%r{/$},"")
-            return previous_base_path + url.sub(%r{^(../)*}, "/")
-          end
-          return previous_path + url
+          return append_relative_path(url)
         when /^\?/
-          return previous_page + url
+          return append_query_string(url)
         when /^\&/
           return previous_page + "?" + replace_querystring_values(url)
         else
@@ -278,13 +286,31 @@ module Skimr
         end
       end
       
+      def append_relative_path(url)
+        if previous_was_server_root?
+          return previous_base_path + url.sub(%r{^(../)*}, "/")
+        end
+        append_path(url)
+      end
+      
+      def previous_was_server_root?
+        previous_base_path.sub(%r{/$},"") == previous_path.sub(%r{/$},"")
+      end
+      
+      def append_query_string(url)
+        previous_page + url
+      end
+      
+      def append_path(url)
+        previous_path + url
+      end
+      
       def replace_querystring_values(url)
         new_querystring = previous_query
         url.split("&").each do |param|
           if !param.empty?
             key, value = param.split("=")
-            ## TODO: What are we trying to match here? When do we end in the else?
-            if new_querystring.match(%r{#{key}=[^&]*})
+            if key_already_exists?(key)
               new_querystring.gsub!(%r{#{key}=[^&]*},"#{key}=#{value}")
             else
               new_querystring += "&#{key}=#{value}"
@@ -294,14 +320,21 @@ module Skimr
         new_querystring
       end
       
+      def key_already_exists?(key)
+        previous_query.match(%r{#{key}=[^&]*})
+      end
+      
       def store_url_helpers(url)
         @previous_url = url
         @previous_page = url.match(/[^\?]*/)[0]
         @previous_query = nil
-        # TODO: If URL match that why?
-        @previous_query = url.match(/\?(.*)/)[1] if url.match(/\?(.*)/)
+        @previous_query = url.match(/\?(.*)/)[1] if has_query_string?(url)
         @previous_base_path = url.match(%r{.*://[^/]*})[0]
         @previous_path = url.match(%r{.*/})[0]
+      end
+      
+      def has_query_string?(url)
+        url.match(/\?(.*)/)
       end
       
       def find_form(form_name)
@@ -384,9 +417,12 @@ module Skimr
       
       def should_return_result?(result, all_required)
         return false if result.empty?
-        ## TODO: Consider making a missing_a_result?()
-        return false if (all_required && result.reject!{|fields| fields.reject!{|k,v| v.nil?}})
+        return false if (all_required && missing_a_result?(result))
         true
+      end
+      
+      def missing_a_result?(result)
+        return true if result.detect{|fields| fields.detect{|k,v| v.nil?}}
       end
       
       def fix_form_action

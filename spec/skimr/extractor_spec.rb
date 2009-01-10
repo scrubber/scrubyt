@@ -205,6 +205,16 @@ describe "Extractor" do
   				end
 				end
 				
+				it "should be able to submit a button by displayed value" do
+          #           mock_mechanize
+          #           @form.should_receive(:name).and_return("form_one")
+          # @extractor = Skimr::Extractor.new(:agent => :standard) do
+          #             fetch "http://www.google.com/"
+          #             submit "I'm Feeling Lucky"
+          #           end
+  				pending
+				end
+				
 				it "should submit the first form on the page by default" do
 				  @mechanize_agent.should_receive(:submit).with(@form, anything()).and_return(@mechanize_page)
 					@extractor = Skimr::Extractor.new(:agent => :standard) do
