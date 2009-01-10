@@ -559,10 +559,9 @@ describe "Extractor" do
       it "should nest detail pages in xml" do
         mock_amazon_results
         @file.should_receive(:write).at_least(:once).with("<root>")
-        @file.should_receive(:write).at_least(:once).with("<result>")
-        @file.should_receive(:write).with("<book_title>Sea Lion</book_title>")
-        @file.should_receive(:write).with("<list_price>$13.98 </list_price>")
-        @file.should_receive(:write).at_least(:once).with("</result>")
+        # TODO: Make this more robust, we can't guarantee that the list_price
+        # and book_title will always be in this order
+        @file.should_receive(:write).with("<result><list_price>$13.98 </list_price><book_title>Sea Lion</book_title></result>")
         @file.should_receive(:write).at_least(:once).with("</root>")
         @extractor = Skimr::Extractor.new :output => :xml_file, :file => @file do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"

@@ -65,13 +65,6 @@ module Skimr
             
       def save_result(name, result)
         notify(:save_results, name, result)
-        # if @options[:file]
-        #   result.each do |r| 
-        #     xml_node = REXML::Element.new name.to_s
-        #     xml_node.text = r
-        #     @options[:file].write xml_node.to_s
-        #   end
-        # else
         @results << {} unless @results.first
         if result.is_a?(Array) && result.size > 1
           @results << result.map{|r| {name => r} }
@@ -80,7 +73,6 @@ module Skimr
         else
           @results.first[name] = result
         end
-        # end
         clear_current_result!
       end
       
