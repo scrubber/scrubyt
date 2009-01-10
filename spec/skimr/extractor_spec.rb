@@ -1,6 +1,6 @@
 require "#{File.dirname(__FILE__)}/../spec_helper.rb"
 require "#{File.dirname(__FILE__)}/../../lib/skimr.rb"
-
+require "#{File.dirname(__FILE__)}/../../plugins/scrubyt_xml_file_output/scrubyt_xml_file_output"
 require "mechanize"
 require "rexml/element"
 
@@ -15,9 +15,8 @@ describe "Extractor" do
 		end
 		
 		it "should store passed in arguments as options" do
-			do_extractor(:agent => :ajax, :output => :xml) 
+			do_extractor(:agent => :ajax) 
 			@extractor.options[:agent].should == :ajax
-			@extractor.options[:output].should == :xml
 		end
 
 		it "should default options if none are passed" do
@@ -56,7 +55,7 @@ describe "Extractor" do
 			  mock_mechanize
 			  logger = mock("logger")
 			  logger.should_receive(:log).at_least(:once)
-				@extractor = Skimr::Extractor.new(:log => logger) do
+				@extractor = Skimr::Extractor.new(:log_level => :verbose) do
 				  fetch "http://www.google.com"
 				end
 			end
@@ -531,7 +530,7 @@ describe "Extractor" do
 	    end
 	    
 	    def do_extractor
-	      @extractor = Skimr::Extractor.new :output => :xml, :file => @file do
+	      @extractor = Skimr::Extractor.new :output => :xml_file, :file => @file do
   				fetch "http://www.google.com/search?&q=ruby"
   				result "//html/body/div[5]/div/div/h2/a"
   			end
@@ -559,11 +558,13 @@ describe "Extractor" do
       
       it "should nest detail pages in xml" do
         mock_amazon_results
+        @file.should_receive(:write).at_least(:once).with("<root>")
         @file.should_receive(:write).at_least(:once).with("<result>")
         @file.should_receive(:write).with("<book_title>Sea Lion</book_title>")
         @file.should_receive(:write).with("<list_price>$13.98 </list_price>")
         @file.should_receive(:write).at_least(:once).with("</result>")
-        @extractor = Skimr::Extractor.new :output => :xml, :file => @file do
+        @file.should_receive(:write).at_least(:once).with("</root>")
+        @extractor = Skimr::Extractor.new :output => :xml_file, :file => @file do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"

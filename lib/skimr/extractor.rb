@@ -1,6 +1,7 @@
-require 'rexml/document'
+# require 'scrubyt_logger.rb'
 module Skimr
   class Extractor
+    include EventDispatcher
     
     attr_accessor :options, :previous_url, :previous_base_path, 
                   :previous_page, :previous_path, :previous_query,
@@ -10,24 +11,36 @@ module Skimr
       defaults = { :agent => :standard,
                    :output => :hash,
                    :child => true,
-                   :log => nil,
-                   :log_level => :info }
+                   :log_level => :info }      
       @options = defaults.merge(options)
+      setup_listeners
       setup_agent
+      setup_output
+      setup_logger
       clear_results!
       @detail = {}
       @detail_definition = []
-      @log = @options[:log]
-      log("initialized_extractor") unless options[:child]
-      if @options[:file] && !options[:child]
-        @options[:file].write "<root>"
-      end
+      notify(:start)
       instance_eval(&extractor_definition)
-      if @options[:file] && !options[:child]
-        @options[:file].write "</root>"
-        clear_results!
+      # clear_results! # if we're storing somewhere other than hash
+      notify(:end)
+    end
+    
+    def setup_logger
+      ScrubytLogger.new(self, @options)
+    end
+    
+    def setup_output
+      return if @options[:output] == :hash
+      if @options[:output] && @options[:output].is_a?(Symbol)
+        outputter = "scrubyt_#{@options[:output]}_output".camelize.constantize
+        @options[:output] = outputter.new(self, @options)
       end
-      log("finished_extractor") unless options[:child]
+    end
+    
+    def outputter
+      return "" if @options[:output] == :hash
+      @options[:output] 
     end
     
     def results
@@ -35,9 +48,6 @@ module Skimr
     end
     
     private    
-      def log(event, output = nil)
-        @log.log(event, output) if @log
-      end
       
       def method_missing(method_name, *args, &block)
         return fetch_next(method_name, *args, &block) if next_page?(method_name)
@@ -54,23 +64,23 @@ module Skimr
       end
             
       def save_result(name, result)
-        log("save_result", "#{name}: #{result}") if @options[:log_level] == :debug        
-        if @options[:file]
-          result.each do |r| 
-            xml_node = REXML::Element.new name.to_s
-            xml_node.text = r
-            @options[:file].write xml_node.to_s
-          end
+        notify(:save_results, name, result)
+        # if @options[:file]
+        #   result.each do |r| 
+        #     xml_node = REXML::Element.new name.to_s
+        #     xml_node.text = r
+        #     @options[:file].write xml_node.to_s
+        #   end
+        # else
+        @results << {} unless @results.first
+        if result.is_a?(Array) && result.size > 1
+          @results << result.map{|r| {name => r} }
+        elsif result.is_a?(Array)
+          @results.first[name] = result.first
         else
-          @results << {} unless @results.first
-          if result.is_a?(Array) && result.size > 1
-            @results << result.map{|r| {name => r} }
-          elsif result.is_a?(Array)
-            @results.first[name] = result.first
-          else
-            @results.first[name] = result
-          end
+          @results.first[name] = result
         end
+        # end
         clear_current_result!
       end
       
@@ -148,7 +158,7 @@ module Skimr
       def fetch(url)
         sleep(@options[:rate_limit]) if @options[:rate_limit]
         full_url = resolve_url(url)
-        log("fetch", full_url)
+        notify(:fetch, full_url)        
         @agent_doc = @agent.get(full_url)
         store_url_helpers(@agent_doc.uri.to_s)
       rescue WWW::Mechanize::ResponseCodeError => err
@@ -166,7 +176,7 @@ module Skimr
           if link
             url = get_value(link, attribute(options))
             url = process_proc(url,options[:script])
-            log("fetch_next_page", url)
+            notify(:next_page, url)
             fetch(url)
             reset_page_state!
             fetch_detail(@detail_definition[0], *@detail_definition[1], &@detail_definition[2])  
@@ -185,17 +195,13 @@ module Skimr
           url = get_value(element, attribute(args))
           full_url = resolve_url(url)
           result_name = result_name.to_s.gsub(/_detail$/,"").to_sym
-          if @options[:file]
-            @options[:file].write "<#{result_name.to_s}>"
-          end
+          notify(:next_detail, result_name, full_url, args)
           detail_result = Extractor.new(@options.merge(:url => full_url), &block).results
           if should_return_result?(detail_result, all_required)
             @results << { result_name => detail_result } 
+            notify(:save_results, result_name, detail_result)
           end
-          if @options[:file]
-            @options[:file].write "</#{result_name.to_s}>"
-            clear_results!
-          end
+          # clear_results!
         end        
       end
       
@@ -207,7 +213,7 @@ module Skimr
       end
       
       def submit(*args)
-        log("submit")
+        notify(:submit)
         find_form(form_name(args)) if supplied_form_name?(args)
         fix_form_action
         @agent_doc = @agent.submit(current_form, find_button(args))
@@ -239,13 +245,13 @@ module Skimr
       end
       
       def fill_textfield(field_name, value, options ={})
-        log("form_textfield", "#{field_name}: #{value}") if @options[:log_level] == :debug
+        notify(:fill_textfield, field_name, value, options)
         @current_form, field = find_form_element(field_name, options)
         field.value = value
       end
       
       def select_option(field_name, option_text, options ={})
-        log("form_select_option", "#{field_name}: #{option_text}") if @options[:log_level] == :debug
+        notify(:select_option, field_name, option_text, options)
         @current_form, field = find_form_element(field_name, options)
         find_select_option(field, option_text).select
       end
@@ -355,7 +361,7 @@ module Skimr
       def setup_agent
         case @options[:agent]
         when :standard
-          log("initialize_agent", "mechanize")
+          notify(:setup_agent)
           require "mechanize"
           Hpricot.buffer_size = 262144
           @agent = WWW::Mechanize.new
