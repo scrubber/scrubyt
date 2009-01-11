@@ -33,7 +33,7 @@ module Skimr
     def setup_output
       return if @options[:output] == :hash
       if @options[:output] && @options[:output].is_a?(Symbol)
-        outputter = "scrubyt_#{@options[:output]}_output".camelize.constantize
+        outputter = "Scrubyt::Output::#{@options[:output].to_s.camelize}".constantize
         @options[:output] = outputter.new(self, @options)
       end
     end
