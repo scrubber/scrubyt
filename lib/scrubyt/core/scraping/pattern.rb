@@ -63,7 +63,7 @@ module Scrubyt
 
     option_reader(:type => :tree, :output_type => :model, :generalize => false,
                   :write_text => lambda { @children.size == 0 }, :limit => nil,
-                  :default => nil, :resolve => :full, :except => nil, :example_type => :determine)
+                  :default => nil, :resolve => :full, :except => [], :example_type => :determine)
 
     def initialize(name, args=[], extractor=nil, parent=nil, &block)
       #init attributes

@@ -14,7 +14,6 @@
 - [NEW] possibility to fetch from a string, by specifying nil as the url and the html string with the :html option 
 - [FIX] firewatir slowness (credit: jak4)
 - [FIX] lot of bugfixes and stability fixes
-- 
 
 == 0.4.0 (unofficial)
 === 31st October, 2007

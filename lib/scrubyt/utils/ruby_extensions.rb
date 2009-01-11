@@ -59,10 +59,27 @@ module Math
   end
 end
 
+#dec 16: Dropped - causes some errors w/ Rails
 #just some hack here to allow current examples' syntax:
 #table_data.to_xml.write(open('result.xml', 'w'), 1)
-class String
-  def write(stringio, add_indent=0)
-    stringio.write((self.split("\n").collect { |line| ('  ' * add_indent) + line }).join("\n"))
+#class String
+#  def write(stringio, add_indent=0)
+#    stringio.write((self.split("\n").collect { |line| ('  ' * add_indent) + line }).join("\n"))
+#  end
+#end
+
+#hack to simulate ancestor::tag selector of XPAth
+module Hpricot
+  class Elem
+    def ancestors(tag = nil)
+      element=self
+      path=Hpricot::Elements.new
+      while element.class != Hpricot::Doc do
+        return element if (tag && (tag ==element.name))
+        path.push element
+        element = element.parent
+      end
+      path
+    end
   end
 end
