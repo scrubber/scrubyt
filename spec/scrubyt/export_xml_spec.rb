@@ -1,5 +1,5 @@
 require "#{File.dirname(__FILE__)}/../spec_helper.rb"
-require "#{File.dirname(__FILE__)}/../../lib/skimr.rb"
+require "#{File.dirname(__FILE__)}/../../lib/scrubyt.rb"
 
 
 describe "XML Export Format" do

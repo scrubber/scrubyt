@@ -1,5 +1,5 @@
 require "#{File.dirname(__FILE__)}/../spec_helper.rb"
-require "#{File.dirname(__FILE__)}/../../lib/skimr.rb"
+require "#{File.dirname(__FILE__)}/../../lib/scrubyt.rb"
 require "#{File.dirname(__FILE__)}/../../plugins/scrubyt_xml_file_output/scrubyt_xml_file_output"
 require "mechanize"
 require "rexml/element"
@@ -10,7 +10,7 @@ describe "Extractor" do
 	describe "when initializing" do
 		
 		def do_extractor(options = {})
-			@extractor = Skimr::Extractor.new options do
+			@extractor = Scrubyt::Extractor.new options do
 			end
 		end
 		
@@ -26,20 +26,20 @@ describe "Extractor" do
 		end
 
 		it "should accept a block as a second parameter" do
-			@extractor = Skimr::Extractor.new(:agent => :standard, :output => :hash) do
+			@extractor = Scrubyt::Extractor.new(:agent => :standard, :output => :hash) do
 			end
-			@extractor.should be_a_kind_of(Skimr::Extractor)
+			@extractor.should be_a_kind_of(Scrubyt::Extractor)
 		end
 
 		it "should accept the block as the only parameter" do
-			@extractor = Skimr::Extractor.new do
+			@extractor = Scrubyt::Extractor.new do
 			end
-			@extractor.should be_a_kind_of(Skimr::Extractor)		
+			@extractor.should be_a_kind_of(Scrubyt::Extractor)		
 		end
 
 		it "should execute the block within the extractor" do
-			Skimr::Extractor.should_receive(:tester).and_return(true)
-			@extractor = Skimr::Extractor.new :agent => :standard do
+			Scrubyt::Extractor.should_receive(:tester).and_return(true)
+			@extractor = Scrubyt::Extractor.new :agent => :standard do
 				self.class.tester
 			end
 		end
@@ -47,13 +47,13 @@ describe "Extractor" do
 		describe "and configuring options" do
 			it "should instantiate mechanize for standard extractor" do
 				WWW::Mechanize.should_receive(:new)
-				@extractor = Skimr::Extractor.new(:agent => :standard) do
+				@extractor = Scrubyt::Extractor.new(:agent => :standard) do
 				end
 			end
 			
 			it "should be able to log output" do
         #         mock_mechanize
-        # @extractor = Skimr::Extractor.new(:log_level => :verbose) do
+        # @extractor = Scrubyt::Extractor.new(:log_level => :verbose) do
         #   fetch "http://www.google.com"
         # end
 				pending
@@ -70,7 +70,7 @@ describe "Extractor" do
 			end
 						
 			def do_extractor
-				@extractor = Skimr::Extractor.new(:agent => :standard) do
+				@extractor = Scrubyt::Extractor.new(:agent => :standard) do
 					fetch "http://www.google.com"
 				end
 			end
@@ -83,7 +83,7 @@ describe "Extractor" do
 			describe "and navigating to a subsequent page" do
 			  
 			  it "should limit the rate results are retrieved" do
-          @extractor = Skimr::Extractor.new(:agent => :standard, :rate_limit => 2) do
+          @extractor = Scrubyt::Extractor.new(:agent => :standard, :rate_limit => 2) do
             self.should_receive(:sleep).with(2).exactly(2).times
             fetch "http://www.google.com"
             fetch "http://www.yahoo.com"
@@ -94,7 +94,7 @@ describe "Extractor" do
 				  mock_mechanize
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com").and_return(@mechanize_page)
 				  @mechanize_agent.should_receive(:get).with("http://www.yahoo.com").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com"
   					fetch "http://www.yahoo.com"
   				end
@@ -105,7 +105,7 @@ describe "Extractor" do
 				  @mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/search/index.html")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html").and_return(@mechanize_page)
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/../somewhere/index.html").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html"
   					fetch "../somewhere/index.html"
   				end
@@ -116,7 +116,7 @@ describe "Extractor" do
 				  @mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/").and_return(@mechanize_page)
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/somewhere/index.html").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					fetch "../../somewhere/index.html"
   				end
@@ -127,7 +127,7 @@ describe "Extractor" do
 					@mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/search/index.html")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html").and_return(@mechanize_page)
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/somewhere/index.html").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html"
   					fetch "/somewhere/index.html"
   				end
@@ -138,7 +138,7 @@ describe "Extractor" do
 					@mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/search/index.html")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html").and_return(@mechanize_page)
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html?q=something").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html"
   					fetch "?q=something"
   				end
@@ -148,7 +148,7 @@ describe "Extractor" do
 					mock_mechanize
 					@mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/search/index.html?q=something")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html?q=something&other=else").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html?q=something"
   					fetch "&other=else"
   				end
@@ -158,7 +158,7 @@ describe "Extractor" do
 					mock_mechanize
 					@mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/search/index.html?q=something&other=else")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html?q=new&other=else").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html?q=something&other=else"
   					fetch "&q=new"
   				end				  
@@ -169,7 +169,7 @@ describe "Extractor" do
 					@mechanize_page.should_receive(:uri).at_least(:once).and_return("http://www.google.com/search/index.html")
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/index.html").and_return(@mechanize_page)
 				  @mechanize_agent.should_receive(:get).with("http://www.google.com/search/other.html").and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html"
   					fetch "other.html"
   				end
@@ -179,7 +179,7 @@ describe "Extractor" do
 				  mock_mechanize
 				  @form.should_receive(:action).and_return("?q=something")
 				  @form.should_receive(:action=).and_return("http://www.google.com/search/index.html?q=something")
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/search/index.html"
   					submit
   				end
@@ -188,7 +188,7 @@ describe "Extractor" do
 				it "should submit a form" do
 				  mock_mechanize
 				  @mechanize_agent.should_receive(:submit).and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					submit
   				end
@@ -197,7 +197,7 @@ describe "Extractor" do
 				it "should be able to submit a form by name" do
 				  mock_mechanize
 		  	  @form.should_receive(:name).and_return("form_one")
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					submit :form_name => "form_one"
   				end
@@ -206,7 +206,7 @@ describe "Extractor" do
 				it "should be able to submit a button by displayed value" do
           #           mock_mechanize
           #           @form.should_receive(:name).and_return("form_one")
-          # @extractor = Skimr::Extractor.new(:agent => :standard) do
+          # @extractor = Scrubyt::Extractor.new(:agent => :standard) do
           #             fetch "http://www.google.com/"
           #             submit "I'm Feeling Lucky"
           #           end
@@ -215,7 +215,7 @@ describe "Extractor" do
 				
 				it "should submit the first form on the page by default" do
 				  @mechanize_agent.should_receive(:submit).with(@form, anything()).and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					submit
   				end
@@ -225,7 +225,7 @@ describe "Extractor" do
 				  field = mock("field")
 				  @form.should_receive(:field).with("q").at_least(:once).and_return(field)
 				  field.should_receive(:value=).with("example text")
-				  @extractor = Skimr::Extractor.new(:agent => :standard) do
+				  @extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					fill_textfield "q", "example text"
   				end
@@ -234,7 +234,7 @@ describe "Extractor" do
 				it "should be able to fill in a text field within a named form" do
 				  mock_named_form
 				  @field.should_receive(:value=).with("example text")
-				  @extractor = Skimr::Extractor.new(:agent => :standard) do
+				  @extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					fill_textfield "q", "example text", :form => "named_form"
   					submit
@@ -248,7 +248,7 @@ describe "Extractor" do
 				  field.stub!(:options).and_return([option])
 				  @form.should_receive(:field).with("select_name").at_least(:once).and_return(field)
 				  option.should_receive(:select)
-				  @extractor = Skimr::Extractor.new(:agent => :standard) do
+				  @extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					select_option "select_name", "Displayed Option Text"
   				end
@@ -263,7 +263,7 @@ describe "Extractor" do
 				  form2.stub!(:action=)
 				  @forms << form2
 				  @mechanize_agent.should_receive(:submit).with(form2, anything()).and_return(@mechanize_page)
-					@extractor = Skimr::Extractor.new(:agent => :standard) do
+					@extractor = Scrubyt::Extractor.new(:agent => :standard) do
   					fetch "http://www.google.com/"
   					fill_textfield "q", "example text"
   					submit
@@ -279,7 +279,7 @@ describe "Extractor" do
 				  it "should navigate to the page of interest" do
 				    @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1").and_return(@result_page1)
 				    @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Beginning-Ruby-Novice-Professional/dp/1590597664/ref=pd_bbs_2_s9_rk?ie=UTF8&s=books&s9r=8a5801be1145d82801118ed052b50980&itemPosition=2&qid=1216806952&sr=8-2").and_return(@result_page2)
-				    @extractor = Skimr::Extractor.new do
+				    @extractor = Scrubyt::Extractor.new do
       				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
       				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
       				  book_title "//h1"
@@ -290,7 +290,7 @@ describe "Extractor" do
 				  it "should navigate to a next link" do
 				    @mechanize_agent.should_receive(:get).with("http://www.amazon.com/s/qid=1216806952/ref=sr_pg_2?ie=UTF8&rs=&keywords=ruby&rh=i%3Aaps%2Ck%3Aruby&page=2"
 				      ).exactly(:once).and_return(@results_list2)
-            @extractor = Skimr::Extractor.new do
+            @extractor = Scrubyt::Extractor.new do
       				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
       				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
       				  book_title "//h1"
@@ -302,7 +302,7 @@ describe "Extractor" do
   				it "should be able to define next link with script processing" do
 				    @mechanize_agent.should_receive(:get).with( "http://www.otherpage.com/"
 				      ).exactly(:once).and_return(@results_list2)
-            @extractor = Skimr::Extractor.new do
+            @extractor = Scrubyt::Extractor.new do
       				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
       				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
       				  book_title "//h1"
@@ -314,7 +314,7 @@ describe "Extractor" do
   				it "should limit how many next pages are fetched" do
   				  @mechanize_agent.should_receive(:get).with("http://www.amazon.com/s/qid=1216806952/ref=sr_pg_2?ie=UTF8&rs=&keywords=ruby&rh=i%3Aaps%2Ck%3Aruby&page=2"
   				      ).exactly(3).times.and_return(@results_list1)
-            @extractor = Skimr::Extractor.new do
+            @extractor = Scrubyt::Extractor.new do
       				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
       				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
       				  book_title "//h1"
@@ -338,7 +338,7 @@ describe "Extractor" do
 
 	    describe "and providing an xpath example" do
 	      it "should return the element text" do
-    	    @extractor = Skimr::Extractor.new do
+    	    @extractor = Scrubyt::Extractor.new do
     				fetch "http://www.google.com/search?&q=ruby"
     				result "//html/body/div[5]/div/div/h2/a"
     			end
@@ -347,7 +347,7 @@ describe "Extractor" do
     	  end
 
     	  it "should return the attribute" do
-    	    @extractor = Skimr::Extractor.new do
+    	    @extractor = Scrubyt::Extractor.new do
     				fetch "http://www.google.com/search?&q=ruby"
     				result "//html/body/div[5]/div/div/h2/a", :attribute => :href
     			end
@@ -356,7 +356,7 @@ describe "Extractor" do
     	  end	  
     	  
     	  it "should pass value into block and return value to extractor" do
-    	    @extractor = Skimr::Extractor.new do
+    	    @extractor = Scrubyt::Extractor.new do
     				fetch "http://www.google.com/search?&q=ruby"
     				result "//html/body/div[5]/div/div/h2/a", :script => lambda{|r| "!Test!#{r}!Test!"}
     			end
@@ -365,7 +365,7 @@ describe "Extractor" do
     	  end
     	  
     	  it "should return multiple values within an example" do
-    	    @extractor = Skimr::Extractor.new do
+    	    @extractor = Scrubyt::Extractor.new do
     				fetch "http://www.google.com/search?&q=ruby"
     				result "//html/body/div[5]/div/div" do
     				  title "//h2"
@@ -378,7 +378,7 @@ describe "Extractor" do
     	  end 
     	  
     	  it "should return nil values within an example if no match" do
-    	    @extractor = Skimr::Extractor.new do
+    	    @extractor = Scrubyt::Extractor.new do
     				fetch "http://www.google.com/search?&q=ruby"
     				result "//html/body/div[5]/div/div" do
     				  title "//h2"
@@ -401,7 +401,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should return result from detail page" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
@@ -412,7 +412,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should return the current url" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  current_url
@@ -423,7 +423,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should return multiple elements on a detail page" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
@@ -436,7 +436,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should concatenate multiple elements if requested" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
@@ -447,7 +447,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should be able to limit the number of results in a given level/detail" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
@@ -459,7 +459,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should be able to not return any result if match is empty or nil" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1", :script => Proc.new{|r| r if r.match(/novice to professional/i)},
@@ -474,7 +474,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should be able to specify certain fields are required" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1", :script => Proc.new{|r| r if r.match(/novice to professional/i)},
@@ -486,7 +486,7 @@ describe "Extractor" do
 		  end
 		  
 		  it "should be able to specify that all fields are required" do
-		    @extractor = Skimr::Extractor.new do
+		    @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a", :required => :all do
   				  book_title "//h1", :script => Proc.new{|r| r if r.match(/novice to professional/i)}
@@ -497,7 +497,7 @@ describe "Extractor" do
 		  end
 		  			
 			it "should return results from next pages" do
-        @extractor = Skimr::Extractor.new do
+        @extractor = Scrubyt::Extractor.new do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
@@ -521,7 +521,7 @@ describe "Extractor" do
 	    end
 	    
 	    def do_extractor
-	      @extractor = Skimr::Extractor.new :output => :xml_file, :file => @file do
+	      @extractor = Scrubyt::Extractor.new :output => :xml_file, :file => @file do
   				fetch "http://www.google.com/search?&q=ruby"
   				result "//html/body/div[5]/div/div/h2/a"
   			end
@@ -544,7 +544,7 @@ describe "Extractor" do
         @file.should_receive(:write).at_least(:once).with("<root>")
         @file.should_receive(:write).with("<result><book_title>Sea Lion</book_title><list_price>$13.98 </list_price></result>")
         @file.should_receive(:write).at_least(:once).with("</root>")
-        @extractor = Skimr::Extractor.new :output => :xml_file, :file => @file do
+        @extractor = Scrubyt::Extractor.new :output => :xml_file, :file => @file do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
   				result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
   				  book_title "//h1"
