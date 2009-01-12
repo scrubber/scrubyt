@@ -1,4 +1,4 @@
-# require 'scrubyt_logger.rb'
+require "#{File.dirname(__FILE__)}/scrubyt_logger.rb"
 module Skimr
   class Extractor
     include EventDispatcher
@@ -11,7 +11,7 @@ module Skimr
       defaults = { :agent => :standard,
                    :output => :hash,
                    :child => true,
-                   :log_level => :info }      
+                   :log_level => :none }      
       @options = defaults.merge(options)
       setup_listeners
       setup_agent
@@ -20,10 +20,12 @@ module Skimr
       clear_results!
       @detail = {}
       @detail_definition = []
-      notify(:start)
+      notify(:start) unless in_detail_block?
       instance_eval(&extractor_definition)
-      # clear_results! # if we're storing somewhere other than hash
-      notify(:end)
+      unless in_detail_block?
+        clear_results! 
+        notify(:end)
+      end
     end
     
     def setup_logger
@@ -31,28 +33,21 @@ module Skimr
     end
     
     def setup_output
-      return if @options[:output] == :hash
-      if @options[:output] && @options[:output].is_a?(Symbol)
         outputter = "Scrubyt::Output::#{@options[:output].to_s.camelize}".constantize
-        @options[:output] = outputter.new(self, @options)
-      end
+        @options[:output_plugin] = outputter.new(self, @options)
     end
-    
-    def outputter
-      return "" if @options[:output] == :hash
-      @options[:output] 
-    end
-    
+        
     def results
-      @results.flatten
+      return @results.flatten if in_detail_block?
+      @options[:output_plugin].results.flatten
     end
     
     private    
       
       def method_missing(method_name, *args, &block)
         return fetch_next(method_name, *args, &block) if next_page?(method_name)
-        return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)        
-        return @results << extract_detail(method_name, *args, &block) if result_block?(&block)
+        return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)
+        return save_result(method_name, extract_detail(method_name, *args, &block)) if result_block?(&block)
         return required_failure! if missing_required_results?(method_name, *args)
         unless required_failure?
           return save_result(:current_url, previous_url) if wants_current_url?(method_name)
@@ -64,16 +59,39 @@ module Skimr
       end
             
       def save_result(name, result)
-        notify(:save_results, name, result)
-        @results << {} unless @results.first
-        if result.is_a?(Array) && result.size > 1
+        if array_of_strings?(result)
           @results << result.map{|r| {name => r} }
+        elsif nested_result_set?(result)
+          @results = result
+        elsif appending_to_results?
+          @results.first << { name => result.empty? ? nil : result }
         elsif result.is_a?(Array)
+          @results << {} unless @results.first
           @results.first[name] = result.first
         else
+          @results << {} unless @results.first
           @results.first[name] = result
         end
+        unless in_detail_block?
+          notify(:save_results, name, @results)          
+        end
         clear_current_result!
+      end
+      
+      def appending_to_results?
+        @results.first.is_a?(Array)
+      end
+      
+      def array_of_strings?(results)
+        results.is_a?(Array) && results.first.is_a?(String)
+      end
+      
+      def nested_result_set?(results)
+        results.is_a?(Array) && results.first && results.first.values.first.is_a?(Array)
+      end
+      
+      def in_detail_block?
+        options[:detail]
       end
       
       def next_page?(method_name)
@@ -171,7 +189,7 @@ module Skimr
             notify(:next_page, url)
             fetch(url)
             reset_page_state!
-            fetch_detail(@detail_definition[0], *@detail_definition[1], &@detail_definition[2])  
+            fetch_detail(@detail_definition[0], *@detail_definition[1], &@detail_definition[2])
           end
         end        
       rescue ArgumentError
@@ -188,19 +206,22 @@ module Skimr
           full_url = resolve_url(url)
           result_name = result_name.to_s.gsub(/_detail$/,"").to_sym
           notify(:next_detail, result_name, full_url, args)
-          detail_result = Extractor.new(@options.merge(:url => full_url), &block).results
+          child_extractor_options = @options.merge(:url => full_url, 
+                                                   :detail => true)
+          detail_result = Extractor.new(child_extractor_options, &block).results
           if should_return_result?(detail_result, all_required)
-            @results << { result_name => detail_result } 
-            notify(:save_results, result_name, detail_result)
+            @results = { result_name => detail_result }
+            notify(:save_results, result_name, @results)
           end
-          # clear_results!
         end        
-      end
+      end      
       
       def extract_detail(result_name, *args, &block)
         locator = args.flatten.shift
         parsed_doc.search(locator).map do |element|
-          { result_name => Extractor.new(@options.merge(:body => element.to_s), &block).results }
+          child_extractor_options = @options.merge(:body => element.to_s,
+                                                   :detail => true)
+          { result_name => Extractor.new(child_extractor_options, &block).results }
         end
       end
       

@@ -1,5 +1,4 @@
 class ScrubytLogger
-  ## event callback methods
   @@log_levels = [:none,
                   :critical,
                   :error,
@@ -46,10 +45,9 @@ class ScrubytLogger
       log("setup agent") if @log_level > 3
     end
   end
-  ## end callback methods
     
   private
     def log(message)
-      # puts message
+      puts message
     end
 end

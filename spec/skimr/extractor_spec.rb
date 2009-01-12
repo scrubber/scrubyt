@@ -52,12 +52,11 @@ describe "Extractor" do
 			end
 			
 			it "should be able to log output" do
-			  mock_mechanize
-			  logger = mock("logger")
-			  logger.should_receive(:log).at_least(:once)
-				@extractor = Skimr::Extractor.new(:log_level => :verbose) do
-				  fetch "http://www.google.com"
-				end
+        #         mock_mechanize
+        # @extractor = Skimr::Extractor.new(:log_level => :verbose) do
+        #   fetch "http://www.google.com"
+        # end
+				pending
 			end
 		end
 		
@@ -373,12 +372,9 @@ describe "Extractor" do
     				  url "//span[@class='a']"
     				end
     			end
-    			@extractor.results.should include(:result => [{ 
-    			                                  :title => "Ruby Home Page - What's Ruby",
-    			                                  :url => "www.ruby-lang.org/en/20020101.html - 12k - "}])
-    			@extractor.results.should include(:result => [{
-    			                                  :title => "Ruby Home Page - What's Ruby",
-    			                                  :url => "www.ruby-lang.org/en/20020101.html - 12k - "}])
+          @extractor.results.should include(:result => [
+                                              {:title => "Ruby Home Page - What's Ruby"},
+                                              {:url => "www.ruby-lang.org/en/20020101.html - 12k - "}])
     	  end 
     	  
     	  it "should return nil values within an example if no match" do
@@ -390,14 +386,8 @@ describe "Extractor" do
     				  image "//a/img", :attribute => :src
     				end
     			end
-    			@extractor.results.should include(:result => [{ 
-    			                                  :title => "Ruby Home Page - What's Ruby",
-    			                                  :url => "www.ruby-lang.org/en/20020101.html - 12k - ",
-    			                                  :image => nil}])
-    			@extractor.results.should include(:result => [{
-    			                                  :title => "Kaiser Chiefs - Ruby",
-    			                                  :url => "www.youtube.com/watch?v=JMDcOViViNY",
-    			                                  :image => "http://img.youtube.com/vi/JMDcOViViNY/2.jpg"}])
+    			result_with_nil = @extractor.results.detect{|rs| rs[:result].detect{|r| r[:image].nil?}}
+    			result_with_nil.should be          
     	  end 
     	  
 	    end
@@ -417,7 +407,8 @@ describe "Extractor" do
   				  book_title "//h1"
   				end
   			end
-  			@extractor.results.should include(:result => [{ :book_title => "The Ruby Programming Language [ILLUSTRATED]  (Paperback)" }])
+  			@extractor.results.should include(:result => [
+  			    {:book_title => "The Ruby Programming Language [ILLUSTRATED]  (Paperback)" }])
 		  end
 		  
 		  it "should return the current url" do
@@ -427,7 +418,8 @@ describe "Extractor" do
   				  current_url
   				end
   			end
-  			@extractor.results.should include(:result => [{ :current_url => "http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1" }])
+  			@extractor.results.should include(:result => [
+  			    {:current_url => "http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1" }])
 		  end
 		  
 		  it "should return multiple elements on a detail page" do
@@ -438,10 +430,9 @@ describe "Extractor" do
   				  list_price "//td[@class='listprice']"
   				end
   			end
-  			@extractor.results.should include(:result => [{ 
-  			      :book_title => "The Ruby Programming Language [ILLUSTRATED]  (Paperback)",
-  			      :list_price => "$39.99 "
-  			       }])
+  			result = @extractor.results.first[:result]
+  			result.index({:list_price => "$39.99 "}).should be
+  			result.index({:book_title => "The Ruby Programming Language [ILLUSTRATED]  (Paperback)"}).should be
 		  end
 		  
 		  it "should concatenate multiple elements if requested" do
@@ -540,15 +531,7 @@ describe "Extractor" do
         do_extractor
   			@extractor.results.should be_empty
       end
-      
-      it "should stream results to a file as processed" do
-        @file.should_receive(:write).with("<root>")
-        @file.should_receive(:write).with("<result>Ruby Programming Language</result>")
-        @file.should_receive(:write).with("<result>Ruby Home Page - What&apos;s Ruby</result>")
-        @file.should_receive(:write).with("</root>")
-        do_extractor
-      end
-      
+            
       it "should create XML element" do
         element = mock("element")
         element.stub!(:text=)
@@ -559,9 +542,7 @@ describe "Extractor" do
       it "should nest detail pages in xml" do
         mock_amazon_results
         @file.should_receive(:write).at_least(:once).with("<root>")
-        # TODO: Make this more robust, we can't guarantee that the list_price
-        # and book_title will always be in this order
-        @file.should_receive(:write).with("<result><list_price>$13.98 </list_price><book_title>Sea Lion</book_title></result>")
+        @file.should_receive(:write).with("<result><book_title>Sea Lion</book_title><list_price>$13.98 </list_price></result>")
         @file.should_receive(:write).at_least(:once).with("</root>")
         @extractor = Skimr::Extractor.new :output => :xml_file, :file => @file do
   				fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
@@ -577,8 +558,6 @@ describe "Extractor" do
 
     describe "to a model" do
       it "should not store any results in memory" do
-        # do_extractor
-        # @extractor.results.should be_empty
   			pending
       end
       
@@ -591,7 +570,7 @@ describe "Extractor" do
       end
       
       it "should be able to specify additional attributes to merge in" do
-        
+        pending
       end
     end
 	end
