@@ -1,4 +1,4 @@
-require "#{File.dirname(__FILE__)}/scrubyt_logger.rb"
+require "#{File.dirname(__FILE__)}/logger.rb"
 require "#{File.dirname(__FILE__)}/navigation.rb"
 require "#{File.dirname(__FILE__)}/results_extraction.rb"
 module Scrubyt
@@ -54,7 +54,7 @@ module Scrubyt
       end
       
       def setup_logger
-        ScrubytLogger.new(self, @options)
+        Scrubyt::Logger.new(self, @options)
       end
 
       def setup_output

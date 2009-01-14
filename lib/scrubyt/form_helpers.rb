@@ -45,7 +45,7 @@ module Scrubyt
           field.value = value
         end
 
-        def select_option(field_name, option_text, options ={})
+        def select_option(field_name, option_text, options ={})          
           notify(:select_option, field_name, option_text, options)
           @current_form, field = find_form_element(field_name, options)
           find_select_option(field, option_text).select
