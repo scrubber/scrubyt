@@ -58,8 +58,16 @@ module Scrubyt
       end
 
       def setup_output
-        outputter = "Scrubyt::Output::#{@options[:output].to_s.camelize}".constantize
-        @options[:output_plugin] = outputter.new(self, @options)
+        if @options[:output].is_a?(Symbol)
+          outputter = "Scrubyt::Output::#{@options[:output].to_s.camelize}".constantize
+          @options[:output_plugin] = outputter.new(self, @options)
+        elsif @options[:output].is_a?(Array)
+          @options[:output_plugin] = []
+          @options[:output].each do |output|
+            outputter = "Scrubyt::Output::#{output.to_s.camelize}".constantize
+            @options[:output_plugin] = outputter.new(self, @options)
+          end
+        end
       end
       
       def in_detail_block?

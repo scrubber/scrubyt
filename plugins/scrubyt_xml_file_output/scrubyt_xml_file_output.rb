@@ -4,14 +4,14 @@ require "#{File.dirname(__FILE__)}/inflections"
 
 class Scrubyt::Output::XmlFile < Scrubyt::Output::Plugin  
   @subscribers = {}
+  on_initialize :setup_file
   before_extractor :open_root_node
   after_extractor :close_root_node
   on_save_result :save_xml
 
 
-  def initialize(extractor, args = {})
+  def setup_file(args = {})
     @file = args[:file]
-    super
   end
 
   def save_xml(name, results)
