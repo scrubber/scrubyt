@@ -46,7 +46,7 @@ module Scrubyt
             end
 
             @@current_doc_url = doc_url
-            @@current_doc_protocol ||= determine_protocol
+            @@current_doc_protocol = determine_protocol
 
             if mechanize_doc.nil? && @@current_doc_protocol != 'file'
               handle_relative_path(doc_url)
@@ -64,7 +64,7 @@ module Scrubyt
               @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(open(@@current_doc_url).read))
             else
               @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc.body))
-              store_host_name(self.get_current_doc_url) if self.get_current_doc_url   # in case we're on a new host
+              store_host_name(self.get_current_doc_url) #if self.get_current_doc_url   # in case we're on a new host
             end
           end
 
