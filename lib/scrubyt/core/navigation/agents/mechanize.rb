@@ -29,13 +29,14 @@ module Scrubyt
           #_doc_url_ - the url or file name to fetch
           def self.fetch(doc_url, *args)
             #Refactor this crap!!! with option_accessor stuff
-
             if args.size > 0
               mechanize_doc = args[0][:mechanize_doc]
               html = args[0][:html]
               resolve = args[0][:resolve]
               basic_auth = args[0][:basic_auth]
               parse_and_set_basic_auth(basic_auth) if basic_auth
+              proxy = args[0][:proxy]
+              parse_and_set_proxy(proxy) if proxy
               if html
                 @@current_doc_protocol = 'string'
                 mechanize_doc = page = WWW::Mechanize::Page.new(nil, {'content-type' => 'text/html'}, html) 
@@ -121,6 +122,38 @@ module Scrubyt
             @@host_name = @@host_name[0..-2] if @@host_name[-1].chr == '/'
             @@original_host_name ||= @@host_name
           end #end of method store_host_name
+
+          def self.parse_and_set_proxy(proxy)
+            proxy = proxy[:proxy]    
+            if proxy.downcase == 'localhost'
+              @@host = 'localhost'
+              @@port = proxy.split(':').last
+            else
+              parts = proxy.split(':')
+              if (parts.size > 2)
+               user_pass = parts[0].split('@')
+               if (user.pass.size > 1)
+                 @@proxy_user = user_pass[0]
+                 @@proxy_pass = user_pass[1]
+               else
+                 @@proxy_user = user_pass
+               end
+               @@host = parts[1]
+               @@port = parts[2]
+              else
+                @@host = parts[0]
+                @@port = parts[1]
+              end
+
+              if (@@host == nil || @@port == nil)# !@@host =~ /^http/)
+                puts "Invalid proxy specification..."
+                puts "neither host nor port can be nil!"
+                exit
+              end
+            end
+            Scrubyt.log :ACTION, "[ACTION] Setting proxy: host=<#{@@host}>, port=<#{@@port}>, username=<#{@@proxy_user}, password=<#{@@proxy_pass}>"
+            @@agent.set_proxy(@@host, @@port)
+          end
 
           def self.determine_protocol
             old_protocol = @@current_doc_protocol
