@@ -1,5 +1,7 @@
-$KCODE = "u"
-require "jcode"
+if RUBY_VERSION < '1.9'
+  $KCODE = "u"
+  require "jcode"
+end
 
 #ruby core
 require "open-uri"
