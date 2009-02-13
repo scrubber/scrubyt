@@ -123,8 +123,7 @@ module Scrubyt
             @@original_host_name ||= @@host_name
           end #end of method store_host_name
 
-          def self.parse_and_set_proxy(proxy)
-            proxy = proxy[:proxy]    
+          def self.parse_and_set_proxy(proxy)  
             if proxy.downcase == 'localhost'
               @@host = 'localhost'
               @@port = proxy.split(':').last
