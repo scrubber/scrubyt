@@ -125,24 +125,27 @@ module Scrubyt
 
           def self.parse_and_set_proxy(proxy)
             @@proxy_user = @@proxy_pass = nil  
-            if proxy.downcase == 'localhost'
+            if proxy.downcase.include?('localhost')
               @@host = 'localhost'
               @@port = proxy.split(':').last
             else
               parts = proxy.split(':')
               if (parts.size > 2)
-               user_pass = parts[0].split('@')
-               if (user_pass.size > 1)
-                 @@proxy_user = user_pass[0]
-                 @@proxy_pass = user_pass[1]
-               else
-                 @@proxy_user = user_pass
-               end
-               @@host = parts[1]
-               @@port = parts[2]
+                user_pass = parts[0].split('@')
+                  @@proxy_user = user_pass[0]
+                  @@proxy_pass = user_pass[1]
+                  @@host = parts[1]
+                  @@port = parts[2]  
               else
-                @@host = parts[0]
-                @@port = parts[1]
+                if (parts[0].include?('@'))
+                  user_host = parts[0].split('@')
+                    @@proxy_user = user_host[0]
+                    @@host = user_host[1]
+                    @@port = parts[1]                  
+                else
+                  @@host = parts[0]
+                  @@port = parts[1]
+                end
               end
 
               if (@@host == nil || @@port == nil)# !@@host =~ /^http/)
@@ -151,7 +154,7 @@ module Scrubyt
                 exit
               end
             end
-            Scrubyt.log :ACTION, "[ACTION] Setting proxy: host=<#{@@host}>, port=<#{@@port}>, username=<#{@@proxy_user}, password=<#{@@proxy_pass}>"
+            Scrubyt.log :ACTION, "[ACTION] Setting proxy: host=<#{@@host}>, port=<#{@@port}>, username=<#{@@proxy_user}>, password=<#{@@proxy_pass}>"
             @@agent.set_proxy(@@host, @@port, @@proxy_user, @@proxy_pass)
           end
 
