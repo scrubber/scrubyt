@@ -2,9 +2,9 @@ module Scrubyt
   module Output    
     
     class Plugin
-      include ClassLevelInheritableAttributes
+      include ScrubytClassLevelInheritableAttributes
 
-      inheritable_attributes :subscribers
+      scrubyt_inheritable_attributes :subscribers
       @subscribers = {}
       
       def initialize(extractor, args = {})
