@@ -131,10 +131,10 @@ module Scrubyt
             else
               parts = proxy.split(':')
               if (parts.size > 2)
-                user_pass = parts[0].split('@')
-                  @@proxy_user = user_pass[0]
-                  @@proxy_pass = user_pass[1]
-                  @@host = parts[1]
+                user_pass = parts[1].split('@')
+                  @@proxy_user = parts[0]
+                  @@proxy_pass = user_pass[0]
+                  @@host = user_pass[1]
                   @@port = parts[2]  
               else
                 if (parts[0].include?('@'))
