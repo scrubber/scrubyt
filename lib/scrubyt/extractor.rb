@@ -1,6 +1,10 @@
 require "#{File.dirname(__FILE__)}/logger.rb"
 require "#{File.dirname(__FILE__)}/navigation.rb"
 require "#{File.dirname(__FILE__)}/results_extraction.rb"
+require 'hpricot'
+require "#{File.dirname(__FILE__)}/inflections.rb"
+
+
 module Scrubyt
   class Extractor
     include EventDispatcher
