@@ -34,13 +34,19 @@ module Scrubyt
         raise RuntimeError.new("You need to specify a detail page before being able to navigate to a next link")
       end
     
+      # fetch_detail is called when there is a detail block
+      # Detail blocks accept the following options
+      #   :required if set to true, will not be saved if one of the fields is missing
+      #   :if takes a proc that accepts the url as argument. If the proc return falses the url is skipped
       def fetch_detail(result_name, *args, &block)
         reset_required_failure!
         clear_current_result!
         locator = args.shift
-        all_required = args.first && args.first[:required] == :all
+        opts = args.first || {}
+        all_required = opts[:required] == :all
         parsed_doc.search(locator).each do |element|
           url = get_value(element, attribute(args))
+          next if opts[:if] && !opts[:if].call(url)
           full_url = resolve_url(url)
           result_name = result_name.to_s.gsub(/_detail$/,"").to_sym
           notify(:next_detail, result_name, full_url, args)
