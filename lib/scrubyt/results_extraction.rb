@@ -1,3 +1,4 @@
+require 'ruby-debug'
 module Scrubyt
   module ResultsExtraction 
     private
@@ -32,6 +33,7 @@ module Scrubyt
           results << process_proc(previous_url, options[:script])
           return results
         else 
+          debugger if options[:debug]
           matching_elements = parsed_doc.search(locator)
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
