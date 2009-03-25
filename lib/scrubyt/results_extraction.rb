@@ -35,6 +35,7 @@ module Scrubyt
           matching_elements = parsed_doc.search(locator)
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
+            element = process_proc(element, options[:hpricot_script])
             result = get_value(element, attribute(options, :text))
             results << process_proc(result, options[:script])
           end
