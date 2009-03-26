@@ -14,6 +14,7 @@ module Scrubyt
     attr_accessor :options, :previous_url, :previous_base_path, 
                   :previous_page, :previous_path, :previous_query,
                   :agent_doc, :current_form, :detail
+    attr_reader   :extractor_definition
 
     def initialize(options = {}, &extractor_definition)
       defaults = { :agent => :standard,
@@ -29,6 +30,7 @@ module Scrubyt
       @detail = {}
       @detail_definition = []
       notify(:start) unless in_detail_block?
+      @extractor_definition = extractor_definition
       instance_eval(&extractor_definition)
       unless in_detail_block?
         clear_results! 
