@@ -58,7 +58,7 @@ module Scrubyt
         locator = args.flatten.shift
         parsed_doc.search(locator).map do |element|
           child_extractor_options = @options.merge(:body => element.to_s,
-                                                   :detail => true)
+                                                   :detail => true, :parent_url => previous_url)
           { result_name => Extractor.new(child_extractor_options, &block).results }
         end
       end

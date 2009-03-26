@@ -22,6 +22,7 @@ module Scrubyt
                    :child => true,
                    :log_level => :none }      
       @options = defaults.merge(options)
+      store_url_helpers(options.delete(:parent_url)) if options[:parent_url]
       setup_listeners
       setup_agent
       setup_output
