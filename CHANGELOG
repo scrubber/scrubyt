@@ -1,5 +1,11 @@
 = scRUBYt! Changelog
 
+== 0.4.3
+== 20th April
+
+- [NEW] option to close the firefox window after the scraping is finished (thanks to Mikkel Garcia and Damien Garros)
+
+
 == 0.4.05
 == 20th October
 

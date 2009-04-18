@@ -83,6 +83,7 @@ module Scrubyt
       
       #Once all is set up, evaluate the extractor from the root pattern!
       root_results = evaluate_extractor
+      FetchAction.close_firefox if @mode.is_a?(Hash) && @mode[:close]
       
       @result = ScrubytResult.new('root')
       @result.push(*root_results)

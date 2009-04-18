@@ -242,6 +242,10 @@ module Scrubyt
             sleep(time)
             @@agent.wait
           end
+          
+          def self.close_firefox
+            @@agent.close
+          end
         end
       end   
     end
