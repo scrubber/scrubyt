@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = %q{scrubyt}
   s.summary = "A powerful Web-scraping framework built on Mechanize and Hpricot (and FireWatir)"
-  s.version = "0.4.16" 
+  s.version = "0.4.20" 
   s.authors = ["Peter Szinek", "Glenn Gillen"]
   s.date = %q{2009-01-31}
   s.description = %q{scRUBYt! is an easy to learn and use, yet powerful and effective web scraping framework. It's most interesting part is a Web-scraping DSL built on HPricot and WWW::Mechanize, which allows to navigate to the page of interest, then extract and query data records with a few lines of code. It is hard to describe scRUBYt! in a few sentences - you have to see it for yourself!}
