@@ -4,6 +4,7 @@
 == 20th April
 
 - [NEW] option to close the firefox window after the scraping is finished (thanks to Mikkel Garcia and Damien Garros)
+- [FIX] scRUBYt! now works with latest version of mechanize (thanks to nesquena, austinmoore and Leandro Nunes)
 
 
 == 0.4.05

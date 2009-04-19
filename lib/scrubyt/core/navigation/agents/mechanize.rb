@@ -278,7 +278,7 @@ module Scrubyt
             loop do
               @@current_form = FetchAction.get_mechanize_doc.forms[i]
               return nil if @@current_form == nil
-              break if @@current_form.form_node.attributes[lookup_attribute_name] == lookup_attribute_value
+              break if @@current_form.form_node.attributes[lookup_attribute_name].to_s == lookup_attribute_value
               i+= 1
             end
           end
