@@ -4,7 +4,7 @@ module Scrubyt
     include FormHelpers
     private
       def fetch(url)
-        url = options[:fetch_page] if options[:fetch_page]
+        url = options.delete(:fetch_page) if options[:fetch_page]
         sleep(@options[:rate_limit]) if @options[:rate_limit]
         full_url = resolve_url(url)
         notify(:fetch, full_url)
