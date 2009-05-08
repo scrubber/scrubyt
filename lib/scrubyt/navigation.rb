@@ -4,7 +4,7 @@ module Scrubyt
     include FormHelpers
     private
       def fetch(url)
-        url = options.delete(:fetch_page) if options[:fetch_page]
+        url = options[:fetch_page] if options[:fetch_page]
         sleep(@options[:rate_limit]) if @options[:rate_limit]
         full_url = resolve_url(url)
         notify(:fetch, full_url)
@@ -57,6 +57,7 @@ module Scrubyt
           notify(:next_detail, result_name, full_url, args)
           child_extractor_options = @options.merge(:url => full_url, 
                                                    :detail => true)
+          child_extractor_options.delete(:fetch_page)                                         
           detail_result = Extractor.new(child_extractor_options, &block).results
           if should_return_result?(detail_result, all_required)
             @results = { result_name => detail_result }
