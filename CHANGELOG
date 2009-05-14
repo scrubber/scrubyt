@@ -4,8 +4,10 @@
 == 23th April
 
 - [NEW] option to close the firefox window after the scraping is finished (thanks to Mikkel Garcia and Damien Garros)
+- [NEW] Added the ability to scrape, click_link, then scrape again.  (Only for firefox agent) (thanks to Mikkel Garcia)
 - [FIX] scRUBYt! now works with latest version of mechanize (thanks to nesquena, austinmoore and Leandro Nunes)
 - [FIX] added test to prohibit traverse_from_match from attempting to traverse nil children (thanks to Dennis Sutch)
+
 
 
 
