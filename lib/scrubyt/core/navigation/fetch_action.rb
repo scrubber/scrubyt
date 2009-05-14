@@ -14,6 +14,15 @@ module Scrubyt
     @@host_name = nil
     @@history = []
     @@current_form = nil
+    @@extractor = nil
+    
+    def self.extractor=(extractor)
+      @@extractor = extractor
+    end
+    
+    def self.extractor
+      return @@extractor
+    end
     
     ##
     # At any given point, the current document can be queried with this method; Typically used

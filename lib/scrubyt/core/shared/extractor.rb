@@ -71,6 +71,7 @@ module Scrubyt
           root_pattern
         end
       end
+      FetchAction.extractor = self
       context.extractor = self
       context.instance_eval(&extractor_definition)
       @evaluating_extractor_definition = false
@@ -84,9 +85,10 @@ module Scrubyt
       #Once all is set up, evaluate the extractor from the root pattern!
       root_results = evaluate_extractor
       FetchAction.close_firefox if @mode.is_a?(Hash) && @mode[:close]
+
       
       @result = ScrubytResult.new('root')
-      @result.push(*root_results)
+      @result.push(*@root_results)
       @result.root_patterns = @root_patterns
       @result.source_file = source_file
       @result.source_proc = extractor_definition
@@ -128,14 +130,14 @@ module Scrubyt
     end
     
     def evaluate_extractor
-      root_results = []
+      @root_results ||= []
       current_page_count = 1
       catch :quit_next_page_loop do
         loop do
           url = get_current_doc_url #TODO need absolute address here 2/4
           @processed_pages << url
           @root_patterns.each do |root_pattern|
-            root_results.push(*root_pattern.evaluate(get_hpricot_doc, nil))
+            @root_results.push(*root_pattern.evaluate(get_hpricot_doc, nil))
           end
           
           while @processed_pages.include? url #TODO need absolute address here 3/4
@@ -161,7 +163,8 @@ module Scrubyt
           current_page_count += 1
         end
       end
-      root_results
+      @root_patterns = []
+      @root_results
     end
     
   end

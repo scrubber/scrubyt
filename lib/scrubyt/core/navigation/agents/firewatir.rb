@@ -103,6 +103,10 @@ module Scrubyt
             end            
             sleep(wait_secs) if wait_secs > 0
             @@agent.wait
+            
+            # evaluate the results
+            extractor.evaluate_extractor
+            
             @@current_doc_url = @@agent.url
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
