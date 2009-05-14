@@ -28,7 +28,15 @@ require "#{File.dirname(__FILE__)}/scrubyt/core/scraping/compound_example.rb"
 require "#{File.dirname(__FILE__)}/scrubyt/output/result_node.rb"
 require "#{File.dirname(__FILE__)}/scrubyt/output/scrubyt_result.rb"
 require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/agents/mechanize.rb"
-require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/agents/firewatir.rb"
+
+# -- Making Firewatir optional --
+  if defined? Firewatir::Firefox
+    require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/agents/firewatir.rb"
+  else
+    puts "The gem firewatir is not installed"
+  end
+# --
+
 require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/navigation_actions.rb"
 require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/fetch_action.rb"
 require "#{File.dirname(__FILE__)}/scrubyt/core/shared/extractor.rb"
