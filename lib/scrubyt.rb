@@ -30,11 +30,11 @@ require "#{File.dirname(__FILE__)}/scrubyt/output/scrubyt_result.rb"
 require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/agents/mechanize.rb"
 
 # -- Making Firewatir optional --
-  if defined? Firewatir::Firefox
-    require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/agents/firewatir.rb"
-  else
-    puts "The gem firewatir is not installed"
-  end
+begin
+  require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/agents/firewatir.rb"
+rescue LoadError
+  puts "The gem firewatir is not installed, you'll be able to use Mechanize as the agent only"
+end
 # --
 
 require "#{File.dirname(__FILE__)}/scrubyt/core/navigation/navigation_actions.rb"
