@@ -1,5 +1,5 @@
-require 'rubygems'
 require 'firewatir'
+
 module Scrubyt
   ##
   #=<tt>Fetching pages (and related functionality)</tt>
@@ -113,9 +113,11 @@ module Scrubyt
             Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
           end          
 
-          def self.click_by_xpath(xpath)
+          def self.click_by_xpath(xpath, wait_secs=0)
             Scrubyt.log :ACTION, "Clicking by XPath : %p" % xpath        
             @@agent.element_by_xpath(xpath).click
+            Scrubyt.log :INFO, "sleeping #{wait_secs}..."
+            sleep(wait_secs) if wait_secs > 0
             @@agent.wait
             @@current_doc_url = @@agent.url
             @@mechanize_doc = "<html>#{@@agent.html}</html>"

@@ -80,6 +80,10 @@ module Scrubyt
       FetchAction.click_by_xpath(xpath)
     end
     
+    def click_by_xpath_and_wait(xpath, secs)
+      FetchAction.click_by_xpath(xpath, secs)
+    end
+    
     def click_image_map(index=0)
       FetchAction.click_image_map(index)
     end

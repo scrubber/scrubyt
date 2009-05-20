@@ -74,13 +74,13 @@ module Scrubyt
           def self.submit(index=nil, sleep_time=nil, type=nil)
             Scrubyt.log :ACTION, 'Submitting form...'
             if index == nil
-              result_page = @@agent.submit(@@current_form)
-              process_submit(@@current_form)
+              #result_page = @@agent.submit(@@current_form)
+              result_page = process_submit(@@current_form)
               #----- added by nickmerwin@gmail.com -----
             elsif index.class == String && !type.nil?
               button = @@current_form.buttons.detect{|b| b.name == index}
-              result_page = @@current_form.submit(button)
-              process_submit(@@current_form, button,type)
+              #result_page = @@current_form.submit(button)
+              result_page = process_submit(@@current_form, button,type)
               #-----------------------------------------
             else
               result_page = @@agent.submit(@@current_form, @@current_form.buttons[index])
@@ -215,7 +215,11 @@ module Scrubyt
         
           def self.fill_textfield(textfield_name, query_string, *unused)
             lookup_form_for_tag('input','textfield',textfield_name,query_string)
-            eval("@@current_form['#{textfield_name}'] = '#{query_string}'")
+            if(@@current_form)
+              eval("@@current_form['#{textfield_name}'] = '#{query_string}'")
+            else
+              Scrubyt.log :ERROR, "Couldn't find the form that contains this textfield. Please report a bug!"
+            end
           end
 
           ##
@@ -253,16 +257,29 @@ module Scrubyt
             else
               result_page = @@agent.submit(current_form, button)
             end
-            @@current_doc_url = result_page.uri.to_s
-            Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
-            fetch(@@current_doc_url, :mechanize_doc => result_page)
+            #@@current_doc_url = result_page.uri.to_s
+            #Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
+            #fetch(@@current_doc_url, :mechanize_doc => result_page)
+            result_page
           end
           
           def self.lookup_form_for_tag(tag, widget_name, name_attribute, query_string, index=0)
             Scrubyt.log :ACTION, "typing #{query_string} into the #{widget_name} named '#{name_attribute}'"
             widget = (FetchAction.get_hpricot_doc/"#{tag}[@name=#{name_attribute}]").map()[index]
             form_tag = Scrubyt::XPathUtils.traverse_up_until_name(widget, 'form')
-            find_form_based_on_tag(form_tag, ['name', 'id', 'action'])
+            puts "=" * 100            
+            puts ">>#{Scrubyt::XPathUtils.generate_XPath(form_tag, nil, true)}<<"
+            puts "=" * 100                   
+            xp = Scrubyt::XPathUtils.generate_XPath(form_tag, nil, true)      
+            form_element =  FetchAction.get_mechanize_doc/xp
+            
+            FetchAction.get_mechanize_doc.forms.each do |f|
+              @@current_form = f
+              break if f.form_node == form_element 
+            end
+
+            
+            #find_form_based_on_tag(form_tag, ['name', 'id', 'action'])
           end
 
           def self.find_form_based_on_tag(tag, possible_attrs)
@@ -274,10 +291,16 @@ module Scrubyt
               lookup_attribute_value = tag.attributes[a]
               break if lookup_attribute_value != nil
             }
+
+            #puts lookup_attribute_name
+            #puts lookup_attribute_value
+
             i = 0
             loop do
               @@current_form = FetchAction.get_mechanize_doc.forms[i]
+              #p @@current_form.form_node
               return nil if @@current_form == nil
+              #puts  ">>#{@@current_form.form_node.attributes[lookup_attribute_name].to_s}<< :: >>#{lookup_attribute_value}<<"
               break if @@current_form.form_node.attributes[lookup_attribute_name].to_s == lookup_attribute_value
               i+= 1
             end
