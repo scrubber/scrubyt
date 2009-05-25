@@ -56,6 +56,10 @@ module Scrubyt
     def fetch(*args)
       FetchAction.fetch(*args)
     end
+    
+    def use_current_page
+      FetchAction.use_current_page
+    end
     ##
     #Submit the current form
     def submit(index=nil, type=nil)
@@ -74,6 +78,10 @@ module Scrubyt
     
     def click_link_and_wait(link_spec, sleep_secs=0)
       FetchAction.click_link(link_spec, 0, sleep_secs)      
+    end
+    
+    def click_by_xpath_if_exists(xpath, sleep_secs=0)
+      FetchAction.click_by_xpath_if_exists(xpath, sleep_secs)
     end
     
     def click_by_xpath(xpath)

@@ -13,8 +13,8 @@ module Scrubyt
     module Firewatir
 
       def self.included(base)
-        base.module_eval do 
-          @@agent = FireWatir::Firefox.new
+        base.module_eval do
+          @@agent = FireWatir::Firefox.new unless defined? @@agent
           @@current_doc_url = nil
           @@current_doc_protocol = nil
           @@base_dir = nil
@@ -58,6 +58,11 @@ module Scrubyt
             end
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
             store_host_name(@@agent.url)   # in case we're on a new host
+          end
+          
+          def self.use_current_page
+            @@mechanize_doc = "<html>#{@@agent.html}</html>"
+            @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
           end
           
           def self.frame(attribute, value)
@@ -111,7 +116,24 @@ module Scrubyt
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
             Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
-          end          
+          end    
+          
+          def self.click_by_xpath_if_exists(xpath, wait_secs=0)
+            begin
+              result_page = @@agent.element_by_xpath(xpath).click
+              sleep(wait_secs) if wait_secs > 0
+              @@agent.wait
+              
+              extractor.evaluate_extractor
+              
+              @@current_doc_url = @@agent.url
+              @@mechanize_doc = "<html>#{@@agent.html}</html>"
+              @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
+              Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"              
+            rescue Watir::Exception::UnknownObjectException
+              Scrubyt.log :INFO, "XPath #{xpath} doesn't exist in this document"
+            end
+          end      
 
           def self.click_by_xpath(xpath, wait_secs=0)
             Scrubyt.log :ACTION, "Clicking by XPath : %p" % xpath        
