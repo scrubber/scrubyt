@@ -556,23 +556,44 @@ describe "Extractor" do
       end
       
       it "should include the first element from each definition" do
-        pending
-        # @extractor = Scrubyt::Extractor.new do
-        #   fetch "http://scrubyt/somepage"
-        #   result ["//tr[@class=adaa]", "//tr[@class=adaa2]", "//tr[@class=adaa3]"], :compound => true do
-        #     book_title "./h1,2"
-        #   end
-        # end
+        @extractor = Scrubyt::Extractor.new do
+                       fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+                       result ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"], :compound => true
+                     end
+        @extractor.results.size.should == 10
+        dulwich_result = @extractor.results[0][:result]
+        nunhead_result = @extractor.results[1][:result]
+        dulwich_result.should match(/East Dulwich/)
+        dulwich_result.should match(/If you're looking for a great/)
+        nunhead_result.should match(/Nunhead/)
+        nunhead_result.should match(/This is a great chance/)
       end
       
       it "should return nested results" do
-        pending
-      end
-      
-      it "should find elements within a specific parent index" do
-        pending
-      end
-      
+        @extractor = Scrubyt::Extractor.new do
+                       fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+                       record ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"], :compound => true do
+                         bedrooms "//td[@class=bedrooms]"
+                         description "//td[@class=description]"
+                         link "//td[@class=description]//a", :attribute => :href
+                       end
+                     end
+        dulwich_result = @extractor.results[0][:record]
+        nunhead_result = @extractor.results[1][:record]
+        dulwich_bedrooms = dulwich_result.detect{|r| r.has_key?(:bedrooms)}[:bedrooms]
+        dulwich_description = dulwich_result.detect{|r| r.has_key?(:description)}[:description]
+        dulwich_link = dulwich_result.detect{|r| r.has_key?(:link)}[:link]
+        nunhead_bedrooms = nunhead_result.detect{|r| r.has_key?(:bedrooms)}[:bedrooms]
+        nunhead_description = nunhead_result.detect{|r| r.has_key?(:description)}[:description]
+        nunhead_link = nunhead_result.detect{|r| r.has_key?(:link)}[:link]
+        
+        dulwich_bedrooms.should match(/1 bedroom/)
+        dulwich_description.should match(/If you're looking for a great/)
+        dulwich_link.should match(/propertyID=95155/)
+        nunhead_bedrooms.should match(/1 bedroom/)
+        nunhead_description.should match(/This is a great chance/)
+        nunhead_link.should match(/propertyID=91457/)
+      end      
     end
     
     describe "with multiple examples" do      

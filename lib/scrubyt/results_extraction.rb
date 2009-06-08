@@ -35,7 +35,20 @@ module Scrubyt
         else 
           debugger if options[:debug]
           if locator.is_a?(Array)
-            matching_elements = locator.map{|l| parsed_doc.search(l)}.flatten
+            if options[:compound]
+              all_matched_elements = locator.map{|l| parsed_doc.search(l)}
+              matching_elements = []
+              while(!all_matched_elements.empty?) do
+                merged_element = Hpricot.build() {}
+                all_matched_elements.size.times do |i|
+                  merged_element.add_child all_matched_elements[i].shift
+                end
+                matching_elements << merged_element
+                all_matched_elements.reject!{|e| e.size < 1}
+              end
+            else
+              matching_elements = locator.map{|l| parsed_doc.search(l)}.flatten
+            end
           else
             matching_elements = parsed_doc.search(locator)
           end
@@ -61,13 +74,31 @@ module Scrubyt
       def extract_detail(result_name, *args, &block)
         locators = args.shift
         locators = [locators] unless locators.is_a?(Array)
-        locators.map do |locator|
-          parsed_doc.search(locator).map do |element|
+        if args.include?({:compound => true})
+          all_matched_elements = locators.map{|l| parsed_doc.search(l)}
+          matching_elements = []
+          while(!all_matched_elements.empty?) do
+            merged_element = Hpricot.build() {}
+            all_matched_elements.size.times do |i|
+              merged_element.add_child all_matched_elements[i].shift
+            end
+            matching_elements << merged_element
+            all_matched_elements.reject!{|e| e.size < 1}
+          end
+          matching_elements.map do |element|
             child_extractor_options = @options.merge(:body => element.to_s,
                                                      :detail => true, :parent_url => previous_url)
             { result_name => Extractor.new(child_extractor_options, &block).results }
           end
-        end.flatten
+        else
+          locators.map do |locator|
+            parsed_doc.search(locator).map do |element|
+              child_extractor_options = @options.merge(:body => element.to_s,
+                                                       :detail => true, :parent_url => previous_url)
+              { result_name => Extractor.new(child_extractor_options, &block).results }
+            end
+          end.flatten
+        end
       end
       
       def merge_results(results, proc)
