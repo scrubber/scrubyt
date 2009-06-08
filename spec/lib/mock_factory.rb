@@ -1,38 +1,38 @@
 module MockFactory
   
   def mock_mechanize
-	  @form = mock("form")
-	  @form.stub!(:field).and_return(false)
-	  @form.stub!(:action).and_return("form_destination.html")
-	  @form.stub!(:action=)
-	  @forms = [@form]
-	  @mechanize_page = mock("page")
-	  @mechanize_page.stub!(:body).and_return("")
-	  @mechanize_page.stub!(:forms).and_return(@forms)
-	  @mechanize_page.stub!(:uri).and_return("http://www.somepage.com/")
-		@mechanize_agent = mock("mechanize")
-		@mechanize_agent.stub!(:get).and_return(@mechanize_page)
-		@mechanize_agent.stub!(:submit).and_return(@mechanize_page)
-		WWW::Mechanize.stub!(:new).and_return(@mechanize_agent)
-	end
-	
-	def mock_google_results
-	  mock_mechanize
+    @form = mock("form")
+    @form.stub!(:field).and_return(false)
+    @form.stub!(:action).and_return("form_destination.html")
+    @form.stub!(:action=)
+    @forms = [@form]
+    @mechanize_page = mock("page")
+    @mechanize_page.stub!(:body).and_return("")
+    @mechanize_page.stub!(:forms).and_return(@forms)
+    @mechanize_page.stub!(:uri).and_return("http://www.somepage.com/")
+    @mechanize_agent = mock("mechanize")
+    @mechanize_agent.stub!(:get).and_return(@mechanize_page)
+    @mechanize_agent.stub!(:submit).and_return(@mechanize_page)
+    WWW::Mechanize.stub!(:new).and_return(@mechanize_agent)
+  end
+  
+  def mock_google_results
+    mock_mechanize
     test_file = "#{File.dirname(__FILE__)}/../mocks/google_results.html"
     @mechanize_page.stub!(:body).and_return(File.open(test_file, "r").read)
-	end
-	
-	def mock_named_form
-	  @field = mock("field")	  
-	  @form.should_receive(:name).and_return("named_form")
-	  @form.should_receive(:field).with("q").and_return(@field)
+  end
+  
+  def mock_named_form
+    @field = mock("field")    
+    @form.should_receive(:name).and_return("named_form")
+    @form.should_receive(:field).with("q").and_return(@field)
     # field = mock("field")
     # @form.should_receive(:field).with("q").at_least(:once).and_return(field)
     # field.should_receive(:value=).with("example text")
-	end
-	
-	def mock_amazon_results
-	  mock_mechanize
+  end
+  
+  def mock_amazon_results
+    mock_mechanize
     results = "#{File.dirname(__FILE__)}/../mocks/amazon_results"
     @results_list1 = mock("page1")
     @results_list2 = mock("page2")
@@ -64,6 +64,6 @@ module MockFactory
         ).and_return(@result_page3)
     @mechanize_agent.stub!(:get).with("http://www.amazon.com/Sea-Lion-Ruby-Suns/dp/B0012IWHLE/ref=sr_1_18?ie=UTF8&s=music&qid=1216806934&sr=8-18"
         ).and_return(@result_page4)
-	end
-	
+  end
+  
 end
