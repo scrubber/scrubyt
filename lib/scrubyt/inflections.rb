@@ -2,7 +2,7 @@ module Scrubyt
   module CoreExtensions
     module String
       module Inflections
-        def included(klass)
+        def self.included(klass)
           unless klass.respond_to?(:camelize) || klass.respond_to?(:classify) || klass.respond_to?(:constantize)
             klass.class_eval do 
               def camelize
