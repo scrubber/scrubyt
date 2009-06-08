@@ -1,0 +1,592 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Extended scRUBYt! examples</title>
+</head>
+<body>
+<div id="content">
+  <div id="container">
+    <div id="searchResults">
+      <div class="searchBarList">
+        <div id="searchBar">
+          <form action="/site/go/search?sales=false" method="post" name="searchForm">
+            <div class="searchFieldPrice">
+              <label>Min. Price:</label>
+              <select name="min" id="buyMinMap">
+                <option value="0" selected="selected">--any--</option>
+                <option value="100">&pound;100</option>
+                <option value="200">&pound;200</option>
+                <option value="300">&pound;300</option>
+                <option value="400">&pound;400</option>
+
+                <option value="500">&pound;500</option>
+                <option value="600">&pound;600</option>
+                <option value="700">&pound;700</option>
+                <option value="800">&pound;800</option>
+                <option value="900">&pound;900</option>
+                <option value="1000">&pound;1,000</option>
+
+                <option value="1250">&pound;1,250</option>
+                <option value="1500">&pound;1,500</option>
+                <option value="1750">&pound;1,750</option>
+                <option value="2000">&pound;2,000</option>
+                <option value="2500">&pound;2,500</option>
+                <option value="3000">&pound;3,000</option>
+
+                <option value="4000">&pound;4,000</option>
+                <option value="5000">&pound;5,000</option>
+                <option value="10000">&pound;10,000</option>
+                <option value="1">&nbsp;</option>
+              </select>
+            </div>
+            <div class="searchFieldPrice">
+              <label>Max. Price:</label>
+              <select name="max" id="buyMax">
+                <option value="0" selected="selected">--any--</option>
+                <option value="100">&pound;100</option>
+                <option value="200">&pound;200</option>
+                <option value="300">&pound;300</option>
+
+                <option value="400">&pound;400</option>
+                <option value="500">&pound;500</option>
+                <option value="600">&pound;600</option>
+                <option value="700">&pound;700</option>
+                <option value="800">&pound;800</option>
+                <option value="900">&pound;900</option>
+
+                <option value="1000">&pound;1,000</option>
+                <option value="1250">&pound;1,250</option>
+                <option value="1500">&pound;1,500</option>
+                <option value="1750">&pound;1,750</option>
+                <option value="2000">&pound;2,000</option>
+                <option value="2500">&pound;2,500</option>
+
+                <option value="3000">&pound;3,000</option>
+                <option value="4000">&pound;4,000</option>
+                <option value="5000">&pound;5,000</option>
+                <option value="10000">&pound;10,000</option>
+                <option value="1">&nbsp;</option>
+              </select>
+            </div>
+
+            <div class="searchFieldRooms">
+              <label>Min. Beds:</label>
+              <select name="beds">
+                <option value="0" selected="selected">none</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
+            <div class="searchFieldArea" style="margin-top: 8px;"> &nbsp;<a href="#" onclick="toggle_visibility('advanced'); return false;"><strong>Advanced</strong></a> </div>
+            <div class="searchBarSubmit" style="margin-top: 8px;">
+              <input type="image" src="/site/custom/scrubytlets/images/searchSubmit.png" name="Submit" value="Search" />
+            </div>
+
+            <div id="hidden">
+              <div class="searchFieldType">
+                <label>Property type:</label>
+                <select name="type"><option value="0" selected="selected">--any--</option>
+                  <option value="2198">Detached</option>
+                  <option value="2199">End Terraced</option>
+                  <option value="2200">Flat</option>
+                  <option value="2201">Maisonette</option>
+                  <option value="2202">Semi-Detached</option>
+                  <option value="2203">Studio</option>
+                  <option value="2204">Terraced</option>
+                  <option value="2218">Purpose built flat</option>
+                  <option value="2255">Town House</option>
+
+                  <option value="2575">Room for rent in flatshare</option>
+                  <option value="2576">Ground floor flat</option>
+                  <option value="2577">Ground floor maisonette</option>
+                  <option value="2578">Apartment</option>
+                  <option value="2579">Penthouse</option>
+                  <option value="2580">House share</option>
+                </select>
+              </div>
+              <div class="searchFieldArea">
+                <label>Location: </label>
+                <input type="text" id="searchArea" name="location" size="15" maxlength="40" value=""/>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    <table class="list">  
+      <tr>
+        <td colspan="3" id="snTop">
+          <div class="searchNav">Properties 1 - 10 of 25</div>
+          <div class="pageList">
+            Page <span class="currentPage">1</span>
+            <a href="/site/go/search?sales=false&page=2">2</a>
+            <a href="/site/go/search?sales=false&page=3">3</a>
+            <a href="/site/go/search?sales=false&page=2">next</a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td rowspan="3" class="thumbnail">
+          <a href="javascript:popUp('/site/go/viewParticulars?propertyID=95155')"><img src="/photos/thumbnails/375507.jpg" width="150" height="112" class="photo" alt="East Dulwich Road, East Dulwich, London, SE22 9AT" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE22 9AT" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+        </td>
+        <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=95155')">East Dulwich</a></span> | 
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+        </td>
+      </tr>
+      <tr>
+        <td class="addressDetails"><span id="address">East Dulwich Road, SE22</span></td>    
+        <td class="bedrooms"><strong>
+
+            1 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Studio
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">If you&#39;re looking for a great little pad in the heart of East Dulwich then this is the flat for you. Located moments from Lordship Lane this self contained ground floor studio with it&#39;s own fr...
+            <br /><br /><span style="color: #000;"><strong>
+
+            £695<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;160pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=95155')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=91457')"><img src="/photos/thumbnails/366288.jpg" width="150" height="112" class="photo" alt="Rosenthorpe road, Nunhead/Peckham Rye, London, SE15 3EG" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE15 3EG" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=91457')">Nunhead/Peckham Rye</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+        
+              
+          
+        
+            </td>
+
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Rosenthorpe road, SE15</span></td>
+    
+    <td class="bedrooms"><strong>
+            1 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Flat
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">This is a great chance to rent a lovely, well presented and spacious 1 double bedroom Victorian flat with a share of garden located on a quiet residential street in Nunhead SE15.<br /><br />The flat b...
+            <br /><br /><span style="color: #000;"><strong>
+            £750<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;173pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=91457')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=95125')"><img src="/photos/thumbnails/375220.jpg" width="150" height="112" class="photo" alt="Kimberley Avenue, Nunhead, London, SE15 3SF" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE15 3SF" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=95125')">Nunhead</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+
+        
+              
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Kimberley Avenue, SE15</span></td>
+    
+    <td class="bedrooms"><strong>
+            1 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Apartment
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">This is a not to be missed chance to rent a really lovely, light and airy 1 bedroom apartment situated in a small, modern and popular apartment block in Nunhead SE15.<br /><br />If your looking for sp...
+            <br /><br /><span style="color: #000;"><strong>
+            £850<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;196pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=95125')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=91459')"><img src="/photos/thumbnails/358046.jpg" width="150" height="112" class="photo" alt="Rommany Road, Gipsy Hill, London, SE27 9PX" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE27 9PX" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=91459')">Gipsy Hill</a></span> | 
+          
+              
+        
+          <img src="/site/custom/scrubytlets/images/letStc.png" alt="let subject to contract" />
+
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Rommany Road, SE27</span></td>
+    
+    <td class="bedrooms"><strong>
+            1 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Flat
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Situated on the border of West Norwood and West Dulwich, this is a great opportunity to rent a stylish and spacious 1 bedroom ground floor flat with a pretty private garden located only a 5 mins walk ...
+            <br /><br /><span style="color: #000;"><strong>
+            £875<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;202pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=91459')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=94128')"><img src="/photos/thumbnails/375248.jpg" width="150" height="112" class="photo" alt="Peckham Hill Street, Peckham, London, SE15 6BN" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE15 6BN" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=94128')">Peckham</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+
+        
+              
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Peckham Hill Street, SE15</span></td>
+    
+    <td class="bedrooms"><strong>
+            1 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Apartment
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Be the first to live in this fabulous, newly built 1 bedroom ground floor apartment with it&#39;s own small courtyard space located in the heart of thriving Peckham SE15.<br /><br />Close to completio...
+            <br /><br /><span style="color: #000;"><strong>
+            £900<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;208pw</span>
+
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=94128')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=88154')"><img src="/photos/thumbnails/343089.jpg" width="150" height="112" class="photo" alt="Gipsy Hill, Crystal Palace, London, SE19 1NL" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE19 1NL" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=88154')">Crystal Palace</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+        
+              
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Gipsy Hill, SE19</span></td>
+    
+    <td class="bedrooms"><strong>
+
+            2 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Ground floor maisonette
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Located only a 3 minute walk from Gipsy Hill station in Crystal Palace SE19, you&#39;ll find this lovely 2 double bed ground floor flat with shared garden and it&#39;s own entrance. <br /><br />The fl...
+            <br /><br /><span style="color: #000;"><strong>
+
+            £950<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;220pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=88154')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=93849')"><img src="/photos/thumbnails/369839.jpg" width="150" height="112" class="photo" alt="Peckham Hill Street, Peckham, London, SE15 6BN" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE15 6BN" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=93849')">Peckham</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+        
+              
+          
+        
+            </td>
+
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Peckham Hill Street, SE15</span></td>
+    
+    <td class="bedrooms"><strong>
+            1 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Apartment
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Be the first to live in this fabulous, newly built 1 bedroom ground floor apartment with a large private front garden located in the heart of thriving Peckham SE15. <br /><br />Close to completion, th...
+            <br /><br /><span style="color: #000;"><strong>
+            £950<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;220pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=93849')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=92866')"><img src="/photos/thumbnails/374831.jpg" width="150" height="112" class="photo" alt="Crystal Palace Park Road, Crystal Palace/Penge, London, SE26 6EG" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE26 6EG" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=92866')">Crystal Palace/Penge</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+
+        
+              
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Crystal Palace Park Road, SE26</span></td>
+    
+    <td class="bedrooms"><strong>
+            2 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Flat
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Don&#39;t miss the chance to grab this beautifully presented and spacious 2 double bedroom first floor Victorian flat, complete with allocated off street parking and large maintained communal gardens,...
+            <br /><br /><span style="color: #000;"><strong>
+            £975<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;225pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=92866')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=93014')"><img src="/photos/thumbnails/365067.jpg" width="150" height="112" class="photo" alt="Thurlby Road, West Norwood, London, SE27 0RN" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SE27 0RN" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=93014')">West Norwood</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+
+        
+              
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Thurlby Road, SE27</span></td>
+    
+    <td class="bedrooms"><strong>
+            3 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Maisonette
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Daisylets are pleased to bring to the rental market this lovely 3 bedroom first floor maisonette located in a quiet residential terraced street of Victorian properties only an 8 minute walk from West ...
+            <br /><br /><span style="color: #000;"><strong>
+            £995<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;230pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=93014')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+        <tr>
+         <td rowspan="3" class="thumbnail">
+            <a href="javascript:popUp('/site/go/viewParticulars?propertyID=67869')"><img src="/photos/thumbnails/257211.jpg" width="150" height="112" class="photo" alt="Worsopp Drive, Clapham, London, SW4 9QS" /></a>
+          <p style="text-align: center; margin: 3px;"><a href="http://scrubyt/findlocation?search_location=SW4 9QS" target="_blank"><img src="/site/custom/scrubytlets/images/view_map.gif" alt="view map" style="border: none; margin-top: 15px;" /></a></p>
+      </td>
+          <td class="propertyAddress" colspan="2"><span id="propertyArea"><a href="javascript:popUp('/site/go/viewParticulars?propertyID=67869')">Clapham</a></span> | 
+          
+          <img src="/site/custom/scrubytlets/images/available.png" alt="available" />
+
+        
+              
+          
+        
+            </td>
+      </tr>
+    <tr>
+    
+    <td class="addressDetails"><span id="address">Worsopp Drive, SW4</span></td>
+    
+    <td class="bedrooms"><strong>
+            2 bedroom<br />
+            </strong><span class="propertyType"><strong>
+            Flat
+            </strong></span></td>
+
+    </tr>
+           <tr>
+          <td colspan="2" class="description">Daisylets are delighted to offer this lovely 2 double bedroom ex-local ground floor flat, laid out over two floors and situated in a great location only 3 minutes from Clapham Common Tube Station and ...
+            <br /><br /><span style="color: #000;"><strong>
+            £1,100<span class="srRentFreq">pcm</span> 
+      
+      
+        <span class="srRentFreq"> &pound;254pw</span>
+      
+      
+            </strong></span>&nbsp;&nbsp;&nbsp;<a href="javascript:popUp('/site/go/viewParticulars?propertyID=67869')" style="font-weight: normal;">More details &amp; photos</a> &nbsp;<span style="color: #666; font-size: 1.2em;">&gt;</span></td>
+
+        </tr>
+
+
+      
+  <tr class="navBar">   
+    
+      <td colspan="3">
+    <div class="searchNav">Properties
+          1
+          -
+          10
+          of
+          25
+      </div>
+        <div class="pageList">Page
+          
+          
+            <span class="currentPage">
+              1
+              </span>
+            
+          
+            
+            <a href="/site/go/search?sales=false&page=2">
+
+              2
+              </a>
+          
+            
+            <a href="/site/go/search?sales=false&page=3">
+              3
+              </a>
+          
+           | <a href="/site/go/search?sales=false&page=2">next</a>
+      </div>
+      </td>
+      </tr>
+
+    </table>
+  
+</div>
+
+
+</div>
+ 
+<div style="clear: both;"></div>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+

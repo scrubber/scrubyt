@@ -22,6 +22,12 @@ module MockFactory
     @mechanize_page.stub!(:body).and_return(File.open(test_file, "r").read)
   end
   
+  def mock_extended_examples
+    mock_mechanize
+    examples_file = "#{File.dirname(__FILE__)}/../mocks/extended_examples.html"
+    @mechanize_page.stub!(:body).and_return(File.open(examples_file, "r").read)
+  end
+  
   def mock_named_form
     @field = mock("field")    
     @form.should_receive(:name).and_return("named_form")

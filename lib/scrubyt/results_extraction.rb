@@ -34,7 +34,11 @@ module Scrubyt
           return results
         else 
           debugger if options[:debug]
-          matching_elements = parsed_doc.search(locator)
+          if locator.is_a?(Array)
+            matching_elements = locator.map{|l| parsed_doc.search(l)}.flatten
+          else
+            matching_elements = parsed_doc.search(locator)
+          end
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
             element = process_proc(element, options[:hpricot_script])
@@ -44,9 +48,9 @@ module Scrubyt
         end
         ## Deals with XPath not always matching nth child properly. Look into
         ## A better solution
-        return @current_result = [results.first] if locator.match(%r{\[1\]$})
+        return @current_result = [results.first] if locator.is_a?(String) && locator.match(%r{\[1\]$})
         ## Shortcut to return the last sibling element 
-        return @current_result = [results.last] if locator.match(%r{\[-1\]$})
+        return @current_result = [results.last] if locator.is_a?(String) && locator.match(%r{\[-1\]$})
         ## Return a limited resultset
         return @current_result = results[0...options[:limit]] if options[:limit]
         ## Return only non-nil/empty results. Look at porting rails #blank?
@@ -55,12 +59,15 @@ module Scrubyt
       end     
       
       def extract_detail(result_name, *args, &block)
-        locator = args.flatten.shift
-        parsed_doc.search(locator).map do |element|
-          child_extractor_options = @options.merge(:body => element.to_s,
-                                                   :detail => true, :parent_url => previous_url)
-          { result_name => Extractor.new(child_extractor_options, &block).results }
-        end
+        locators = args.shift
+        locators = [locators] unless locators.is_a?(Array)
+        locators.map do |locator|
+          parsed_doc.search(locator).map do |element|
+            child_extractor_options = @options.merge(:body => element.to_s,
+                                                     :detail => true, :parent_url => previous_url)
+            { result_name => Extractor.new(child_extractor_options, &block).results }
+          end
+        end.flatten
       end
       
       def merge_results(results, proc)
@@ -139,7 +146,10 @@ module Scrubyt
       end
 
       def has_result_definition?(*args)
-        !args.empty? && (args.first.match(%r{//}) || args.first == "current_url")
+        return false if args.empty?
+        return true if args.first == "current_url"
+        return true if args.first.is_a?(Array) && args.first.first.match(%r{//})
+        args.first.match(%r{//})
       end
       
       def process_proc(string_input, proc)
@@ -151,6 +161,7 @@ module Scrubyt
       end
       
       def merge_elements?(locator)
+        return false if locator.is_a?(Array)
         locator.match(%r{/\*$})
       end
   end

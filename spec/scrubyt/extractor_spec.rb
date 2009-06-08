@@ -549,6 +549,56 @@ describe "Extractor" do
       end
               
     end          
+    
+    describe "with compound examples" do      
+      before(:each) do
+        mock_extended_examples
+      end
+      
+      it "should include the first element from each definition" do
+        pending
+        # @extractor = Scrubyt::Extractor.new do
+        #   fetch "http://scrubyt/somepage"
+        #   result ["//tr[@class=adaa]", "//tr[@class=adaa2]", "//tr[@class=adaa3]"], :compound => true do
+        #     book_title "./h1,2"
+        #   end
+        # end
+      end
+      
+      it "should return nested results" do
+        pending
+      end
+      
+      it "should find elements within a specific parent index" do
+        pending
+      end
+      
+    end
+    
+    describe "with multiple examples" do      
+      before(:each) do
+        mock_extended_examples
+      end
+
+      it "should return all elements matching the examples" do
+        @extractor = Scrubyt::Extractor.new do
+                       fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+                       result ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"]
+                     end
+        @extractor.results.size.should == 40
+      end
+      
+      it "should return nested results" do
+        @extractor = Scrubyt::Extractor.new do
+                       fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+                       record ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"] do
+                         result "//a"
+                       end
+                     end
+        @extractor.results.should include({:record=>[{:result=>"East Dulwich"}]})
+        @extractor.results.should include({:record=>[{:result=>"More details & photos"}]})
+      end
+    end
 
     describe "to an xml file" do
       
