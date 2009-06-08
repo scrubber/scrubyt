@@ -1,3 +1,4 @@
+require 'ruby-debug'
 module Scrubyt
   module ResultsExtraction 
     private
@@ -32,9 +33,11 @@ module Scrubyt
           results << process_proc(previous_url, options[:script])
           return results
         else 
+          debugger if options[:debug]
           matching_elements = parsed_doc.search(locator)
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
+            element = process_proc(element, options[:hpricot_script])
             result = get_value(element, attribute(options, :text))
             results << process_proc(result, options[:script])
           end
@@ -55,7 +58,7 @@ module Scrubyt
         locator = args.flatten.shift
         parsed_doc.search(locator).map do |element|
           child_extractor_options = @options.merge(:body => element.to_s,
-                                                   :detail => true)
+                                                   :detail => true, :parent_url => previous_url)
           { result_name => Extractor.new(child_extractor_options, &block).results }
         end
       end

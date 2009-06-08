@@ -4,48 +4,56 @@ module Scrubyt
     include FormHelpers
     private
       def fetch(url)
+        url = options[:fetch_page] if options[:fetch_page]
         sleep(@options[:rate_limit]) if @options[:rate_limit]
         full_url = resolve_url(url)
-        notify(:fetch, full_url)        
+        notify(:fetch, full_url)
         @agent_doc = @agent.get(full_url)
         store_url_helpers(@agent_doc.uri.to_s)
       rescue WWW::Mechanize::ResponseCodeError => err
       rescue EOFError
       end
     
-      def fetch_next(result_name, *args, &block)        
+      def fetch_next(result_name, *args)      
+        return if options[:fetch_page]  # We are already fetching the next page...
         reset_required_failure!
         clear_current_result!
         locator = args.shift
-        options = args.first || {}
-        options[:limit] ||= 500
-        options[:limit].times do
+        opts = args.first || {}
+        opts[:limit] ||= 500
+        opts[:limit].times do
           link = parsed_doc.search(locator).first
           if link
-            url = get_value(link, attribute(options))
-            url = process_proc(url,options[:script])
-            notify(:next_page, url)
-            fetch(url)
+            url = get_value(link, attribute(opts))
+            url = process_proc(url,opts[:script])
+            notify(:fetch_page, url)
+            full_url = resolve_url(url)
             reset_page_state!
-            fetch_detail(@detail_definition[0], *@detail_definition[1], &@detail_definition[2])
+            options.merge!(:fetch_page => full_url)
+            instance_eval(&extractor_definition)
           end
-        end        
-      rescue ArgumentError
-        raise RuntimeError.new("You need to specify a detail page before being able to navigate to a next link")
+        end
       end
     
+      # fetch_detail is called when there is a detail block
+      # Detail blocks accept the following options
+      #   :required if set to true, will not be saved if one of the fields is missing
+      #   :if takes a proc that accepts the url as argument. If the proc return falses the url is skipped
       def fetch_detail(result_name, *args, &block)
         reset_required_failure!
         clear_current_result!
         locator = args.shift
-        all_required = args.first && args.first[:required] == :all
+        opts = args.first || {}
+        all_required = opts[:required] == :all
         parsed_doc.search(locator).each do |element|
           url = get_value(element, attribute(args))
+          next if opts[:if] && !opts[:if].call(url)
           full_url = resolve_url(url)
           result_name = result_name.to_s.gsub(/_detail$/,"").to_sym
           notify(:next_detail, result_name, full_url, args)
           child_extractor_options = @options.merge(:url => full_url, 
                                                    :detail => true)
+          child_extractor_options.delete(:fetch_page)                                         
           detail_result = Extractor.new(child_extractor_options, &block).results
           if should_return_result?(detail_result, all_required)
             @results = { result_name => detail_result }

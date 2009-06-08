@@ -1,6 +1,10 @@
 require "#{File.dirname(__FILE__)}/logger.rb"
 require "#{File.dirname(__FILE__)}/navigation.rb"
 require "#{File.dirname(__FILE__)}/results_extraction.rb"
+require 'hpricot'
+require "#{File.dirname(__FILE__)}/inflections.rb"
+
+
 module Scrubyt
   class Extractor
     include EventDispatcher
@@ -10,6 +14,7 @@ module Scrubyt
     attr_accessor :options, :previous_url, :previous_base_path, 
                   :previous_page, :previous_path, :previous_query,
                   :agent_doc, :current_form, :detail
+    attr_reader   :extractor_definition
 
     def initialize(options = {}, &extractor_definition)
       defaults = { :agent => :standard,
@@ -17,6 +22,7 @@ module Scrubyt
                    :child => true,
                    :log_level => :none }      
       @options = defaults.merge(options)
+      store_url_helpers(options.delete(:parent_url)) if options[:parent_url]
       setup_listeners
       setup_agent
       setup_output
@@ -25,6 +31,7 @@ module Scrubyt
       @detail = {}
       @detail_definition = []
       notify(:start) unless in_detail_block?
+      @extractor_definition = extractor_definition
       instance_eval(&extractor_definition)
       unless in_detail_block?
         clear_results! 
