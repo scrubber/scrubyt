@@ -3,6 +3,7 @@ require "#{File.dirname(__FILE__)}/navigation.rb"
 require "#{File.dirname(__FILE__)}/results_extraction.rb"
 require 'hpricot'
 require "#{File.dirname(__FILE__)}/inflections.rb"
+require 'json'
 
 
 module Scrubyt
@@ -31,8 +32,12 @@ module Scrubyt
       @detail = {}
       @detail_definition = []
       notify(:start) unless in_detail_block?
-      @extractor_definition = extractor_definition
-      instance_eval(&extractor_definition)
+      if options[:json]
+        execute_json(options[:json])
+      else
+        @extractor_definition = extractor_definition
+        instance_eval(&extractor_definition)
+      end
       unless in_detail_block?
         clear_results! 
         notify(:end)
@@ -44,12 +49,12 @@ module Scrubyt
       @options[:output_plugin].results.flatten
     end
     
-    private    
+    private
       
       def method_missing(method_name, *args, &block)
         return fetch_next(method_name, *args, &block) if next_page?(method_name)
         return fetch_detail(method_name, *args, &block) if detail_block?(method_name, *args, &block)
-        return save_result(method_name, extract_detail(method_name, *args, &block)) if result_block?(&block)
+        return save_result(method_name, extract_detail(method_name, *args, &block)) if result_block?(*args, &block)
         return required_failure! if missing_required_results?(method_name, *args)
         unless required_failure?
           return save_result(:current_url, previous_url) if wants_current_url?(method_name)
@@ -57,6 +62,27 @@ module Scrubyt
           return save_result(method_name, extract_result(method_name, *args)) if result_node?(method_name, *args)
           return save_result(method_name, extract_result(method_name, *args)) if result_set?(method_name, *args)
           super
+        end
+      end
+      
+      def execute_json(json)
+        JSON.parse(json).each do |hash|
+          hash.each do |k,v|
+            case v
+            when NilClass
+              send k
+            when String
+              send(k, v)
+            when Array
+              send(k, *v)
+            when Hash
+              if v.has_key?("xpath") && v.has_key?("block")
+                code = []
+                code << %Q{#{k.to_s} "#{v["xpath"]}", :json => #{v["block"].inspect}}
+                instance_eval(code.join("\n"))
+              end
+            end
+          end
         end
       end
       
@@ -92,7 +118,11 @@ module Scrubyt
         end
       end
       
-      def result_block?(&block)
+      def result_block?(*args, &block)
+        if args
+          args.shift
+          return true if args.detect{|h| h.has_key?(:json)}
+        end
         ! block.nil?
       end
             

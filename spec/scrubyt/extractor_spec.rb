@@ -2,6 +2,7 @@ require "#{File.dirname(__FILE__)}/../spec_helper.rb"
 require "#{File.dirname(__FILE__)}/../../lib/scrubyt.rb"
 require "#{File.dirname(__FILE__)}/../../plugins/scrubyt_xml_file_output/scrubyt_xml_file_output"
 require "mechanize"
+require "json"
 require "rexml/element"
 
 describe "Extractor" do
@@ -204,12 +205,12 @@ describe "Extractor" do
         end
         
         it "should be able to submit a button by displayed value" do
-          #           mock_mechanize
-          #           @form.should_receive(:name).and_return("form_one")
+          # mock_mechanize
+          # @form.should_receive(:name).and_return("form_one")
           # @extractor = Scrubyt::Extractor.new(:agent => :standard) do
-          #             fetch "http://www.google.com/"
-          #             submit "I'm Feeling Lucky"
-          #           end
+          #   fetch "http://www.google.com/"
+          #   submit "I'm Feeling Lucky"
+          # end
           pending
         end
         
@@ -345,6 +346,27 @@ describe "Extractor" do
               end
               next_page "//a[@id='pagnNextLink']", :limit => 3
             end
+          end
+          
+          it "should return nested result blocks" do
+            @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1").and_return(@result_page1)
+            @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Beginning-Ruby-Novice-Professional/dp/1590597664/ref=pd_bbs_2_s9_rk?ie=UTF8&s=books&s9r=8a5801be1145d82801118ed052b50980&itemPosition=2&qid=1216806952&sr=8-2").and_return(@result_page2)
+            @extractor = Scrubyt::Extractor.new do
+              fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+              result "//td[@class='searchitem']" do
+                shipping "//td[@class='srListSSS']"
+                book_detail "//td[@class='dataColumn']//tr[1]/td[1]/a" do
+                  book_title "//h1"
+                end
+              end
+            end
+            @extractor.results.should include(:result => [
+                                                { :shipping=>"Eligible for FREE Super Saver Shipping."},
+                                                { :book => [
+                                                  { :book_title => "The Ruby Programming Language [ILLUSTRATED]  (Paperback)"}
+                                                ]}
+                                              ])
+            
           end
           
         end        
@@ -506,7 +528,7 @@ describe "Extractor" do
           end
         end
         all_results = @extractor.results
-        book_title_results = @extractor.results.select{|rd| rd[:result].detect{|r| r.has_key?(:book_title)}}
+        book_title_results = all_results.select{|rd| rd[:result].detect{|r| r.has_key?(:book_title)}}
         book_title_results.size.should == 1
         all_results.size.should > 1
       end
@@ -684,4 +706,83 @@ describe "Extractor" do
     end
   end
   
+  describe "when generating from JSON" do
+    
+    before(:each) do
+      mock_cross_site_examples
+    end
+    
+    describe "and it's a flat definition structure" do
+      
+      def scraper_json
+        [{ :fetch => "http://scrubyt.test/" },
+         { :submit => nil },
+         { :result => "//h2" }].to_json
+      end
+      
+      it "should return results" do
+        @extractor = Scrubyt::Extractor.new(:json => scraper_json)
+        @extractor.results.should include(:result => "scRUBYt!")
+        @extractor.results.should include(:result => "Ruby, Rails, Web2.0")
+      end
+    end
+    
+    describe "and it's a nested definition structure" do
+      
+      def scraper_json
+        [{ :fetch => "http://scrubyt.test/" },
+            { :submit => nil},
+            { :result => {
+                :xpath => "//ol//li",
+                :block => [
+                  { :title => "//h2"},
+                  { :description => "//p"}
+                ]}
+            }].to_json
+      end
+      
+      it "should return results" do
+        @extractor = Scrubyt::Extractor.new(:json => scraper_json)
+        @extractor.results.should include(:result => [{ :title => "scRUBYt!" }, 
+                                                      { :description => "The best web scraping framework around!"}])
+        @extractor.results.should include(:result => [{ :title => "Ruby Pond" },
+                                                      { :description => "Glenn Gillen's company"}])
+      end
+    end
+    
+    describe "and it's nested with detail blocks" do
+      
+      def scraper_json
+        [{ :fetch => "http://scrubyt.test/" },
+            { :submit => nil},
+            { :result => {
+                :xpath => "//ol//li",
+                :block => [
+                  { :title => "//h2"},
+                  { :description => "//p"},
+                  { :page_detail => {
+                      :xpath => "//a",
+                      :block => [
+                        { :image => ["//img", { :attribute => :src }] }
+                      ]
+                    }
+                  }
+               ]
+             }
+           }].to_json
+      end
+      
+      it "should return results" do
+        @extractor = Scrubyt::Extractor.new(:json => scraper_json)
+        @extractor.results.should include(:result => [{ :title => "scRUBYt!" }, 
+                                                      { :description => "The best web scraping framework around!"},
+                                                      { :page => [
+                                                          { :image => "scrubyt-image-1.gif" }, 
+                                                          { :image => "scrubyt-image-2.gif" }, 
+                                                          { :image => "scrubyt-image-3.gif" }, 
+                                                          { :image => "scrubyt-image-4.gif" }]
+                                                        }])
+      end
+    end
+  end
 end

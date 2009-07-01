@@ -51,12 +51,19 @@ module Scrubyt
           full_url = resolve_url(url)
           result_name = result_name.to_s.gsub(/_detail$/,"").to_sym
           notify(:next_detail, result_name, full_url, args)
-          child_extractor_options = @options.merge(:url => full_url, 
+          options = @options
+          options.delete(:hash)
+          options[:json] = args.detect{|h| h.has_key?(:json)}[:json].to_json if args.detect{|h| h.has_key?(:json)}
+          child_extractor_options = options.merge(:url => full_url, 
                                                    :detail => true)
-          child_extractor_options.delete(:fetch_page)                                         
+          child_extractor_options.delete(:fetch_page)
           detail_result = Extractor.new(child_extractor_options, &block).results
           if should_return_result?(detail_result, all_required)
-            @results = { result_name => detail_result }
+            if options[:detail] && options[:child]
+              @results << { result_name => detail_result }
+            else
+              @results = { result_name => detail_result }
+            end
             notify(:save_results, result_name, @results)
           end
         end        

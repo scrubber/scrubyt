@@ -1,5 +1,9 @@
 module MockFactory
   
+  def mock_path
+    "#{File.dirname(__FILE__)}/../mocks"
+  end
+  
   def mock_mechanize
     @form = mock("form")
     @form.stub!(:field).and_return(false)
@@ -18,14 +22,40 @@ module MockFactory
   
   def mock_google_results
     mock_mechanize
-    test_file = "#{File.dirname(__FILE__)}/../mocks/google_results.html"
+    test_file = "#{mock_path}/google_results.html"
     @mechanize_page.stub!(:body).and_return(File.open(test_file, "r").read)
   end
   
   def mock_extended_examples
     mock_mechanize
-    examples_file = "#{File.dirname(__FILE__)}/../mocks/extended_examples.html"
+    examples_file = "#{mock_path}/extended_examples.html"
     @mechanize_page.stub!(:body).and_return(File.open(examples_file, "r").read)
+  end
+  
+  def mock_mechanize_page(url, body)
+    uri = URI.join(url)
+    response = Net::HTTPOK.new(1.1, 200, "OK")
+    response['content-type'] = "text/html; charset=utf-8"
+    
+    WWW::Mechanize::Page.new(uri, response, 
+                             body, code="200", mech=@mechanize_agent)
+  end
+  
+  def mock_cross_site_examples
+    @mechanize_agent = WWW::Mechanize.new
+    WWW::Mechanize.stub!(:new).and_return(@mechanize_agent)
+    index_page = mock_mechanize_page("http://scrubyt.test/", File.open("#{mock_path}/cross_site_mock.html", "r").read)
+    results_page = mock_mechanize_page("http://scrubyt.test/cross_site_results_mock.html", File.open("#{mock_path}/cross_site_results_mock.html", "r").read)
+    scrubyt_page = mock_mechanize_page("http://www.scrubyt.org", File.open("#{mock_path}/cross_site_ext_scrubyt_mock.html", "r").read)
+    rubypond_page = mock_mechanize_page("http://rubypond.com", File.open("#{mock_path}/cross_site_ext_rubypond_mock.html", "r").read)
+    hexagile_page = mock_mechanize_page("http://www.hexagile.com", File.open("#{mock_path}/cross_site_ext_hexagile_mock.html", "r").read)
+    rubyrailways_page = mock_mechanize_page("http://www.rubyrailways.com", File.open("#{mock_path}/cross_site_ext_rubyrailways_mock.html", "r").read)
+    @mechanize_agent.stub!(:get).and_return(results_page)
+    @mechanize_agent.stub!(:get).with("http://scrubyt.test/").and_return(index_page)
+    @mechanize_agent.stub!(:get).with("http://www.scrubyt.org/").and_return(scrubyt_page)
+    @mechanize_agent.stub!(:get).with("http://rubypond.com/").and_return(rubypond_page)
+    @mechanize_agent.stub!(:get).with("http://www.hexagile.com/").and_return(hexagile_page)
+    @mechanize_agent.stub!(:get).with("http://www.rubyrailways.com/").and_return(rubyrailways_page)
   end
   
   def mock_named_form
@@ -39,7 +69,7 @@ module MockFactory
   
   def mock_amazon_results
     mock_mechanize
-    results = "#{File.dirname(__FILE__)}/../mocks/amazon_results"
+    results = "#{mock_path}/amazon_results"
     @results_list1 = mock("page1")
     @results_list2 = mock("page2")
     @result_page1 = mock("result")

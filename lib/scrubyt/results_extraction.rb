@@ -33,7 +33,7 @@ module Scrubyt
           results << process_proc(previous_url, options[:script])
           return results
         else 
-          debugger if options[:debug]
+          debugger if options[:debug]          
           if locator.is_a?(Array)
             if options[:compound]
               all_matched_elements = locator.map{|l| parsed_doc.search(l)}
@@ -86,14 +86,19 @@ module Scrubyt
             all_matched_elements.reject!{|e| e.size < 1}
           end
           matching_elements.map do |element|
-            child_extractor_options = @options.merge(:body => element.to_s,
+            options = @options
+            options.delete(:hash)
+            child_extractor_options = options.merge(:body => element.to_s,
                                                      :detail => true, :parent_url => previous_url)
             { result_name => Extractor.new(child_extractor_options, &block).results }
           end
         else
           locators.map do |locator|
             parsed_doc.search(locator).map do |element|
-              child_extractor_options = @options.merge(:body => element.to_s,
+              options = @options
+              options.delete(:json)
+              options[:json] = args.detect{|h| h.has_key?(:json)}[:json].to_json if args.detect{|h| h.has_key?(:json)}
+              child_extractor_options = options.merge(:body => element.to_s,
                                                        :detail => true, :parent_url => previous_url)
               { result_name => Extractor.new(child_extractor_options, &block).results }
             end
@@ -112,7 +117,7 @@ module Scrubyt
       def attribute(options, default = :href)
         options = options.first if options.is_a?(Array)
         return default if options.nil? || options.empty?        
-        options[:attribute] || default
+        options[:attribute] || options["attribute"] || default
       end
       
       def should_return_result?(result, all_required)
