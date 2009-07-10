@@ -205,13 +205,24 @@ describe "Extractor" do
         end
         
         it "should be able to submit a button by displayed value" do
-          # mock_mechanize
-          # @form.should_receive(:name).and_return("form_one")
-          # @extractor = Scrubyt::Extractor.new(:agent => :standard) do
-          #   fetch "http://www.google.com/"
-          #   submit "I'm Feeling Lucky"
-          # end
-          pending
+          mock_google_results
+          @extractor = Scrubyt::Extractor.new(:agent => :standard) do
+            fetch "http://www.google.com/search/index.html?q=something"
+            submit "I'm Feeling Lucky"
+          end
+        end
+        
+        it "should be able to submit a button by XPath" do
+          mock_google_results
+          button = mock("button", :value => "Search", :name => "btnG")
+          buttons = [mock("button", :value => "I'm Feeling Lucky", :name => "btnG"),
+                     button]
+          @form.stub!(:buttons).and_return(buttons)          
+          @mechanize_agent.should_receive(:submit).with(@form, button)
+          @extractor = Scrubyt::Extractor.new(:agent => :standard) do
+            fetch "http://www.google.com/search/index.html?q=something"
+            submit "//input[@type=submit][@value='Search']"
+          end
         end
         
         it "should submit the first form on the page by default" do

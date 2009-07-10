@@ -22,6 +22,9 @@ module MockFactory
   
   def mock_google_results
     mock_mechanize
+    buttons = [mock("button", :value => "I'm Feeling Lucky", :name => "btnG"),
+               mock("button", :value => "Search", :name => "btnG")]
+    @form.stub!(:buttons).and_return(buttons)
     test_file = "#{mock_path}/google_results.html"
     @mechanize_page.stub!(:body).and_return(File.open(test_file, "r").read)
   end
