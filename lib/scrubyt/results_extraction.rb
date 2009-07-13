@@ -94,6 +94,7 @@ module Scrubyt
             { result_name => Extractor.new(child_extractor_options, &block).results }
           end
         else
+          
           locators.map do |locator|
             parsed_doc.search(clean_xpath(locator)).map do |element|
               options = @options

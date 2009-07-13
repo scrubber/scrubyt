@@ -765,7 +765,7 @@ describe "Extractor" do
       def scraper_json
         [{ :fetch => "http://scrubyt.test/" },
          { :submit => nil },
-         { :result => "//h2" }].to_json
+         { :result => { :xpath => "//h2"} }].to_json
       end
       
       it "should return results" do
@@ -779,14 +779,15 @@ describe "Extractor" do
       
       def scraper_json
         [{ :fetch => "http://scrubyt.test/" },
-            { :submit => nil},
-            { :result => {
-                :xpath => "//ol//li",
-                :block => [
-                  { :title => "//h2"},
-                  { :description => "//p"}
-                ]}
-            }].to_json
+         { :submit => nil},
+         { :result => {
+             :xpath => "//ol//li",
+             :block => [
+               { :title => { :xpath => "//h2"},
+                 :description => { :xpath => "//p"}}
+               ]
+             }
+          }].to_json
       end
       
       it "should return results" do
@@ -802,34 +803,32 @@ describe "Extractor" do
       
       def scraper_json
         [{ :fetch => "http://scrubyt.test/" },
-            { :submit => nil},
-            { :result => {
-                :xpath => "//ol//li",
-                :block => [
-                  { :title => "//h2"},
-                  { :description => "//p"},
-                  { :page_detail => {
-                      :xpath => "//a",
-                      :block => [
-                        { :image => ["//img", { :attribute => :src }] }
-                      ]
-                    }
+         { :submit => nil},
+         { :result => {
+             :xpath => "//ol//li",
+             :block => [
+               { :title => { :xpath => "//h2"},
+                 :description => { :xpath => "//p"},
+                 :page_detail => {
+                   :xpath => "//a",
+                   :block => [
+                     { :image => { :xpath => "//img", :attribute => :src }}]
                   }
-               ]
-             }
-           }].to_json
+                }
+              ]
+            }
+          }
+        ].to_json
       end
       
       it "should return results" do
         @extractor = Scrubyt::Extractor.new(:json => scraper_json)
-        @extractor.results.should include(:result => [{ :title => "scRUBYt!" }, 
-                                                      { :description => "The best web scraping framework around!"},
-                                                      { :page => [
-                                                          { :image => "scrubyt-image-1.gif" }, 
-                                                          { :image => "scrubyt-image-2.gif" }, 
-                                                          { :image => "scrubyt-image-3.gif" }, 
-                                                          { :image => "scrubyt-image-4.gif" }]
-                                                        }])
+        result = @extractor.results.detect{|r| r[:result].include?({:title => "scRUBYt!"})}[:result]
+        result.should be_include({ :description => "The best web scraping framework around!"})
+        result.should be_include({ :page => [{ :image => "scrubyt-image-1.gif" }, 
+                                             { :image => "scrubyt-image-2.gif" }, 
+                                             { :image => "scrubyt-image-3.gif" }, 
+                                             { :image => "scrubyt-image-4.gif" }]})
       end
     end
   end

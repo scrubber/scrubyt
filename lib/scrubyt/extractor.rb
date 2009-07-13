@@ -76,10 +76,15 @@ module Scrubyt
             when Array
               send(k, *v)
             when Hash
+              # require 'ruby-debug'; debugger
               if v.has_key?("xpath") && v.has_key?("block")
                 code = []
                 code << %Q{#{k.to_s} "#{v["xpath"]}", :json => #{v["block"].inspect}}
                 instance_eval(code.join("\n"))
+              elsif v.has_key?("xpath")
+                element = v.delete("xpath")
+                args = [element, v]
+                send(k, *args)
               end
             end
           end
