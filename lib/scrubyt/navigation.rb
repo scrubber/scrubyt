@@ -22,7 +22,7 @@ module Scrubyt
         opts = args.first || {}
         opts[:limit] ||= 500
         opts[:limit].times do
-          link = parsed_doc.search(locator).first
+          link = parsed_doc.search(clean_xpath(locator)).first
           if link
             url = get_value(link, attribute(opts))
             url = process_proc(url,opts[:script])
@@ -45,7 +45,7 @@ module Scrubyt
         locator = args.shift
         opts = args.first || {}
         all_required = opts[:required] == :all
-        parsed_doc.search(locator).each do |element|
+        parsed_doc.search(clean_xpath(locator)).each do |element|
           url = get_value(element, attribute(args))
           next if opts[:if] && !opts[:if].call(url)
           full_url = resolve_url(url)

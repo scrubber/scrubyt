@@ -36,7 +36,8 @@ module Scrubyt
           debugger if options[:debug]          
           if locator.is_a?(Array)
             if options[:compound]
-              all_matched_elements = locator.map{|l| parsed_doc.search(l)}
+              
+              all_matched_elements = locator.map{|l| parsed_doc.search(clean_xpath(l))}
               matching_elements = []
               while(!all_matched_elements.empty?) do
                 merged_element = Hpricot.build() {}
@@ -47,10 +48,10 @@ module Scrubyt
                 all_matched_elements.reject!{|e| e.size < 1}
               end
             else
-              matching_elements = locator.map{|l| parsed_doc.search(l)}.flatten
+              matching_elements = locator.map{|l| parsed_doc.search(clean_xpath(l))}.flatten
             end
           else
-            matching_elements = parsed_doc.search(locator)
+            matching_elements = parsed_doc.search(clean_xpath(locator))
           end
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
@@ -75,7 +76,7 @@ module Scrubyt
         locators = args.shift
         locators = [locators] unless locators.is_a?(Array)
         if args.include?({:compound => true})
-          all_matched_elements = locators.map{|l| parsed_doc.search(l)}
+          all_matched_elements = locators.map{|l| parsed_doc.search(clean_xpath(l))}
           matching_elements = []
           while(!all_matched_elements.empty?) do
             merged_element = Hpricot.build() {}
@@ -94,7 +95,7 @@ module Scrubyt
           end
         else
           locators.map do |locator|
-            parsed_doc.search(locator).map do |element|
+            parsed_doc.search(clean_xpath(locator)).map do |element|
               options = @options
               options.delete(:json)
               options[:json] = args.detect{|h| h.has_key?(:json)}[:json].to_json if args.detect{|h| h.has_key?(:json)}
@@ -184,8 +185,8 @@ module Scrubyt
       def has_result_definition?(*args)
         return false if args.empty?
         return true if args.first == "current_url"
-        return true if args.first.is_a?(Array) && args.first.first.match(%r{//})
-        args.first.match(%r{//})
+        return true if args.first.is_a?(Array) && args.first.first.match(%r{(^//)|(^/[a-zA-Z])|(^\./)})
+        args.first.match(%r{(^//)|(^/[a-zA-Z])|(^\./)})
       end
       
       def process_proc(string_input, proc)
@@ -199,6 +200,10 @@ module Scrubyt
       def merge_elements?(locator)
         return false if locator.is_a?(Array)
         locator.match(%r{/\*$})
+      end
+      
+      def clean_xpath(xpath)
+        xpath.sub(%r{^\./},"//").sub(%r{/tbody},"")
       end
   end
 end

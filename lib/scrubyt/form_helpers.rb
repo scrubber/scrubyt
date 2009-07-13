@@ -12,7 +12,7 @@ module Scrubyt
           if supplied_form_name?(args)
             find_form(form_name(args)) 
           elsif supplied_button_xpath?(args)
-            xpathed_button = parsed_doc.search(args.first).first
+            xpathed_button = parsed_doc.search(clean_xpath(args.first)).first
             @current_form = @agent_doc.forms.detect{|f| f.buttons.detect{|b| b.name == xpathed_button["name"] && b.value == xpathed_button["value"]}}
             button = @current_form.buttons.detect{|b| b.name == xpathed_button["name"] && b.value == xpathed_button["value"]}
           end
@@ -36,7 +36,7 @@ module Scrubyt
         end
         
         def supplied_button_xpath?(options)
-          options.first.is_a?(String) && options.first =~ %r{^//[a-zA-Z]}
+          options.first.is_a?(String) && options.first.match(%r{(^/[a-zA-Z/])|(^\./[a-zA-Z/])})
         end
 
         def button_name(options)

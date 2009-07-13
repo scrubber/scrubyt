@@ -224,6 +224,20 @@ describe "Extractor" do
             submit "//input[@type=submit][@value='Search']"
           end
         end
+
+        it "should be able to adjust XPaths to ones we support" do
+          mock_google_results
+          button = mock("button", :value => "Search", :name => "btnG")
+          buttons = [mock("button", :value => "I'm Feeling Lucky", :name => "btnG"),
+                     button]
+          @form.stub!(:buttons).and_return(buttons)          
+          @mechanize_agent.should_receive(:submit).with(@form, button)
+          @extractor = Scrubyt::Extractor.new(:agent => :standard) do
+            fetch "http://www.google.com/search/index.html?q=something"
+            submit "./html//input[@type=submit][@value='Search']"
+          end
+        end
+
         
         it "should submit the first form on the page by default" do
           @mechanize_agent.should_receive(:submit).with(@form, anything()).and_return(@mechanize_page)
@@ -299,6 +313,17 @@ describe "Extractor" do
             end
           end
           
+          it "should be able to adjust XPaths to ones we support" do
+            @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1").and_return(@result_page1)
+            @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Beginning-Ruby-Novice-Professional/dp/1590597664/ref=pd_bbs_2_s9_rk?ie=UTF8&s=books&s9r=8a5801be1145d82801118ed052b50980&itemPosition=2&qid=1216806952&sr=8-2").and_return(@result_page2)
+            @extractor = Scrubyt::Extractor.new do
+              fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+              result_detail "./html//table[@id='searchTemplate']/tbody//td[@class='dataColumn']//tr[1]/td[1]/a" do
+                book_title "./html//h1"
+              end
+            end
+          end
+          
           it "should only navigate to pages whose url is accepted by the if block" do
             @mechanize_agent.should_receive(:get).with("http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1").and_return(@result_page1)
             @mechanize_agent.should_not_receive(:get).with("http://www.amazon.com/Beginning-Ruby-Novice-Professional/dp/1590597664/ref=pd_bbs_2_s9_rk?ie=UTF8&s=books&s9r=8a5801be1145d82801118ed052b50980&itemPosition=2&qid=1216806952&sr=8-2").and_return(@result_page2)
@@ -319,6 +344,18 @@ describe "Extractor" do
                 book_title "//h1"
               end
               next_page "//a[@id='pagnNextLink']", :limit => 1
+            end
+          end
+          
+          it "should be able to adjust XPaths to ones we support" do
+            @mechanize_agent.should_receive(:get).with("http://www.amazon.com/s/qid=1216806952/ref=sr_pg_2?ie=UTF8&rs=&keywords=ruby&rh=i%3Aaps%2Ck%3Aruby&page=2"
+              ).exactly(:once).and_return(@results_list2)
+            @extractor = Scrubyt::Extractor.new do
+              fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+              result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
+                book_title "//h1"
+              end
+              next_page "./html//a[@id='pagnNextLink']", :limit => 1
             end
           end
           

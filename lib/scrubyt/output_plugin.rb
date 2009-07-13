@@ -1,3 +1,4 @@
+require "#{File.dirname(__FILE__)}/class_level_inheritable_attributes"
 module Scrubyt
   module Output    
     
