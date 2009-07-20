@@ -45,7 +45,8 @@ module Scrubyt
         locator = args.shift
         opts = args.first || {}
         all_required = opts[:required] == :all
-        parsed_doc.search(clean_xpath(locator)).each do |element|
+        locator = clean_xpath(locator).sub(%r{(/a[^/]*).*}, "\\1")
+        parsed_doc.search(locator).each do |element|
           url = get_value(element, attribute(args))
           next if opts[:if] && !opts[:if].call(url)
           full_url = resolve_url(url)
