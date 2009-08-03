@@ -74,7 +74,10 @@ module Scrubyt
       
       def extract_detail(result_name, *args, &block)
         locators = args.shift
-        locators = [locators] unless locators.is_a?(Array)
+        unless locators.is_a?(Array)
+          is_simple_match = true
+          locators = [locators] 
+        end
         if args.include?({:compound => true})
           all_matched_elements = locators.map{|l| parsed_doc.search(clean_xpath(l))}
           matching_elements = []
@@ -94,13 +97,13 @@ module Scrubyt
             { result_name => Extractor.new(child_extractor_options, &block).results }
           end
         else
-          
           locators.map do |locator|
             parsed_doc.search(clean_xpath(locator)).map do |element|
               options = @options
               options.delete(:json)
               options[:json] = args.detect{|h| h.has_key?(:json)}[:json].to_json if args.detect{|h| h.has_key?(:json)}
-              child_extractor_options = options.merge(:body => element.to_s,
+              element_body = is_simple_match ? element.children.to_s : element.to_s
+              child_extractor_options = options.merge(:body => element_body,
                                                        :detail => true, :parent_url => previous_url)
               { result_name => Extractor.new(child_extractor_options, &block).results }
             end

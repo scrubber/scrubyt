@@ -677,6 +677,28 @@ describe "Extractor" do
       end      
     end
     
+    describe "with a simple example" do      
+      before(:each) do
+        mock_extended_examples
+      end
+      
+      it "should not require duplicate specification of container element like a compound does" do
+        @extractor = Scrubyt::Extractor.new do
+                       fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+                       record "//td[@class=propertyAddress]" do
+                         link "/span/a", :attribute => :href
+                       end
+                     end
+        dulwich_result = @extractor.results[0][:record]
+        nunhead_result = @extractor.results[1][:record]
+        dulwich_link = dulwich_result.detect{|r| r.has_key?(:link)}[:link]
+        nunhead_link = nunhead_result.detect{|r| r.has_key?(:link)}[:link]
+
+        dulwich_link.should match(/propertyID=95155/)
+        nunhead_link.should match(/propertyID=91457/)
+      end
+    end
+    
     describe "with multiple examples" do      
       before(:each) do
         mock_extended_examples
