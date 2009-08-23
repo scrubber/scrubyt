@@ -221,7 +221,7 @@ describe "Extractor" do
           @mechanize_agent.should_receive(:submit).with(@form, button)
           @extractor = Scrubyt::Extractor.new(:agent => :standard) do
             fetch "http://www.google.com/search/index.html?q=something"
-            submit "//input[@type=submit][@value='Search']"
+            submit "//input[@type='submit'][@value='Search']"
           end
         end
 
@@ -234,7 +234,7 @@ describe "Extractor" do
           @mechanize_agent.should_receive(:submit).with(@form, button)
           @extractor = Scrubyt::Extractor.new(:agent => :standard) do
             fetch "http://www.google.com/search/index.html?q=something"
-            submit "./html//input[@type=submit][@value='Search']"
+            submit "./html//input[@type='submit'][@value='Search']"
           end
         end
 
@@ -375,7 +375,7 @@ describe "Extractor" do
               ).exactly(:once).and_return(@results_list2)
             @extractor = Scrubyt::Extractor.new do
               fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-              result_detail "//td[@class='searchItem']" do
+              result "//td[@class='searchItem']" do
                 book_title "//span[@class='srTitle']"
               end
               next_page "//a[@id='pagnNextLink']", :limit => 1
@@ -639,7 +639,7 @@ describe "Extractor" do
       it "should include the first element from each definition" do
         @extractor = Scrubyt::Extractor.new do
                        fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-                       result ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"], :compound => true
+                       result ["//td[@class='propertyAddress']", "//td[@class='addressDetails']", "//td[@class='bedrooms']", "//td[@class='description']"], :compound => true
                      end
         @extractor.results.size.should == 10
         dulwich_result = @extractor.results[0][:result]
@@ -653,10 +653,10 @@ describe "Extractor" do
       it "should return nested results" do
         @extractor = Scrubyt::Extractor.new do
                        fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-                       record ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"], :compound => true do
-                         bedrooms "//td[@class=bedrooms]"
-                         description "//td[@class=description]"
-                         link "//td[@class=description]//a", :attribute => :href
+                       record ["//td[@class='propertyAddress']", "//td[@class='addressDetails']", "//td[@class='bedrooms']", "//td[@class='description']"], :compound => true do
+                         bedrooms "//td[@class='bedrooms']"
+                         description "//td[@class='description']"
+                         link "//td[@class='description']//a", :attribute => :href
                        end
                      end
         dulwich_result = @extractor.results[0][:record]
@@ -685,7 +685,7 @@ describe "Extractor" do
       it "should not require duplicate specification of container element like a compound does" do
         @extractor = Scrubyt::Extractor.new do
                        fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-                       record "//td[@class=propertyAddress]" do
+                       record "//td[@class='propertyAddress']" do
                          link "/span/a", :attribute => :href
                        end
                      end
@@ -707,7 +707,7 @@ describe "Extractor" do
       it "should return all elements matching the examples" do
         @extractor = Scrubyt::Extractor.new do
                        fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-                       result ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"]
+                       result ["//td[@class='propertyAddress']", "//td[@class='addressDetails']", "//td[@class='bedrooms']", "//td[@class='description']"]
                      end
         @extractor.results.size.should == 40
       end
@@ -715,7 +715,7 @@ describe "Extractor" do
       it "should return nested results" do
         @extractor = Scrubyt::Extractor.new do
                        fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
-                       record ["//td[@class=propertyAddress]", "//td[@class=addressDetails]", "//td[@class=bedrooms]", "//td[@class=description]"] do
+                       record ["//td[@class='propertyAddress']", "//td[@class='addressDetails']", "//td[@class='bedrooms']", "//td[@class='description']"] do
                          result "//a"
                        end
                      end
@@ -798,14 +798,25 @@ describe "Extractor" do
       def scraper_json
         [{ :fetch => "http://scrubyt.test/" },
          { :submit => nil },
-         { :result => { :xpath => "//h2"} }].to_json
+         { :result => { :xpath => "//h2"} },
+         { :next_page => { :xpath => "//ol[@class='pagination']/li/a[text()='Next']"}}].to_json
       end
       
       it "should return results" do
         @extractor = Scrubyt::Extractor.new(:json => scraper_json)
         @extractor.results.should include(:result => "scRUBYt!")
         @extractor.results.should include(:result => "Ruby, Rails, Web2.0")
+      end      
+      
+      it "should handle a special URL case" do
+        this_json = [{ :fetch => "http://scrubyt.test/" },
+                     { :submit => nil },
+                     { :result => { :url => "current_url"} }].to_json
+        
+        @extractor = Scrubyt::Extractor.new(:json => this_json)
+        @extractor.results.should include(:result => "http://scrubyt.test/cross_site_results_mock.html")
       end
+      
     end
     
     describe "and it's a nested definition structure" do
@@ -830,6 +841,35 @@ describe "Extractor" do
         @extractor.results.should include(:result => [{ :title => "Ruby Pond" },
                                                       { :description => "Glenn Gillen's company"}])
       end
+    end
+    
+    describe "and it's got detail blocks" do
+      
+      def scraper_json
+        [{ :fetch => "http://scrubyt.test/" },
+         { :submit => nil},
+         { :page_detail => {
+           :xpath => "//a",
+           :block => [
+             { :image => { :xpath => "//img", :attribute => :src }}]
+          }},
+         { :next_page => { :xpath => "//ol[@class='pagination']/li/a[text()='Next']"}}
+         ].to_json
+      end
+      
+      it "should return results" do
+        @extractor = Scrubyt::Extractor.new(:json => scraper_json)
+        @extractor.results.should be_include({ :page => [{ :image => "scrubyt-image-1.gif" }, 
+                                                         { :image => "scrubyt-image-2.gif" }, 
+                                                         { :image => "scrubyt-image-3.gif" }, 
+                                                         { :image => "scrubyt-image-4.gif" }]})
+      end
+      
+      it "should follow next links" do
+        @mechanize_agent.should_receive(:get).with("http://scrubyt.test/2.html")
+        @extractor = Scrubyt::Extractor.new(:json => scraper_json)
+      end
+      
     end
     
     describe "and it's nested with detail blocks" do

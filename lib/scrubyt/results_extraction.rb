@@ -36,11 +36,10 @@ module Scrubyt
           debugger if options[:debug]          
           if locator.is_a?(Array)
             if options[:compound]
-              
-              all_matched_elements = locator.map{|l| parsed_doc.search(clean_xpath(l))}
+              all_matched_elements = locator.map{|l| parsed_doc.search(clean_xpath(l)).to_a}
               matching_elements = []
               while(!all_matched_elements.empty?) do
-                merged_element = Hpricot.build() {}
+                merged_element = Nokogiri::HTML.parse("")
                 all_matched_elements.size.times do |i|
                   merged_element.add_child all_matched_elements[i].shift
                 end
@@ -79,10 +78,10 @@ module Scrubyt
           locators = [locators] 
         end
         if args.include?({:compound => true})
-          all_matched_elements = locators.map{|l| parsed_doc.search(clean_xpath(l))}
+          all_matched_elements = locators.map{|l| parsed_doc.search(clean_xpath(l)).to_a}
           matching_elements = []
           while(!all_matched_elements.empty?) do
-            merged_element = Hpricot.build() {}
+            merged_element = Nokogiri::HTML.parse("")
             all_matched_elements.size.times do |i|
               merged_element.add_child all_matched_elements[i].shift
             end

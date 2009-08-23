@@ -1,6 +1,7 @@
 require "#{File.dirname(__FILE__)}/form_helpers.rb"
 module Scrubyt
-  module Navigation   
+  class ScrapeNextJSONPage < StandardError; end
+  module Navigation
     include FormHelpers
     private
       def fetch(url)
@@ -30,11 +31,15 @@ module Scrubyt
             full_url = resolve_url(url)
             reset_page_state!
             options.merge!(:fetch_page => full_url)
-            instance_eval(&extractor_definition)
+            if options[:json]
+              raise ScrapeNextJSONPage.new(full_url)
+            else
+              instance_eval(&extractor_definition)
+            end
           end
         end
       end
-    
+      
       # fetch_detail is called when there is a detail block
       # Detail blocks accept the following options
       #   :required if set to true, will not be saved if one of the fields is missing

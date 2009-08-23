@@ -1,7 +1,6 @@
 require "#{File.dirname(__FILE__)}/logger.rb"
 require "#{File.dirname(__FILE__)}/navigation.rb"
 require "#{File.dirname(__FILE__)}/results_extraction.rb"
-require 'hpricot'
 require "#{File.dirname(__FILE__)}/inflections.rb"
 require 'json'
 
@@ -33,6 +32,7 @@ module Scrubyt
       @detail_definition = []
       notify(:start) unless in_detail_block?
       if options[:json]
+        options[:json] = JSON.parse(options[:json]) if options[:json].is_a?(String)
         execute_json(options[:json])
       else
         @extractor_definition = extractor_definition
@@ -66,7 +66,7 @@ module Scrubyt
       end
       
       def execute_json(json)
-        JSON.parse(json).each do |hash|
+        json.each do |hash|
           hash.each do |k,v|
             case v
             when NilClass
@@ -84,10 +84,20 @@ module Scrubyt
                 element = v.delete("xpath")
                 args = [element, v]
                 send(k, *args)
+              elsif v.has_key?("url")
+                element = v.delete("xpath")
+                args = ["current_url", v]
+                send(k, *args)
               end
             end
           end
         end
+      rescue Scrubyt::ScrapeNextJSONPage => err
+        execute_json(strip_navigation(json))
+      end
+      
+      def strip_navigation(json)
+        json.reject{|s| s.has_key?("submit")}
       end
       
       def setup_logger
@@ -131,9 +141,9 @@ module Scrubyt
       end
             
       def parsed_doc
-        @parsed_doc ||= Hpricot(@agent_doc.body)
+        @parsed_doc ||= Nokogiri::HTML.parse(@agent_doc.body)
         rescue NoMethodError
-          @parsed_doc = Hpricot("")
+          @parsed_doc = Nokogiri::HTML.parse("")
       end
     
       def setup_agent
@@ -141,14 +151,13 @@ module Scrubyt
         when :standard
           notify(:setup_agent)
           require "mechanize"
-          Hpricot.buffer_size = 262144
           @agent = WWW::Mechanize.new
         end
         ## TODO: Clearer distinction between requesting url and processing body for detail
         if @options[:url]
           fetch(@options[:url]) 
         elsif @options[:body]
-          @parsed_doc = Hpricot(@options[:body])
+          @parsed_doc = Nokogiri::HTML.parse(@options[:body])
         end
       end
       

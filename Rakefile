@@ -13,7 +13,6 @@ gem_spec = Gem::Specification.new do |s|
   s.authors = ['Glenn Gillen','Peter Szinek']
   s.email = ['glenn.gillen@gmail.com', 'peter@rubyrailways.com']
   s.homepage = 'http://www.scrubyt.org'
-  s.add_dependency('hpricot', '>= 0.5')
   s.add_dependency('mechanize', '>= 0.6.3')
   s.has_rdoc = 'false'
 end
