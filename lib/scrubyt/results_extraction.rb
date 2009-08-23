@@ -206,7 +206,7 @@ module Scrubyt
       end
       
       def clean_xpath(xpath)
-        xpath.sub(%r{^\./},"//").sub(%r{/tbody},"")
+        xpath.sub(%r{^\./},"//").gsub(%r{/tbody},"")
       end
   end
 end
