@@ -684,7 +684,7 @@ describe "Extractor" do
       
       it "should not require duplicate specification of container element like a compound does" do
         @extractor = Scrubyt::Extractor.new do
-                       fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+                       fetch "http://scrubyt.com/"
                        record "//td[@class='propertyAddress']" do
                          link "/span/a", :attribute => :href
                        end
@@ -696,6 +696,20 @@ describe "Extractor" do
 
         dulwich_link.should match(/propertyID=95155/)
         nunhead_link.should match(/propertyID=91457/)
+      end
+      
+      it "should work even if class definitions have extra spaces" do
+         @extractor = Scrubyt::Extractor.new do
+                         fetch "http://scrubyt.com/"
+                         record "//td[@class='propertyAddress']" do
+                           link "/span/a", :attribute => :href
+                         end
+                       end
+          lewisham_result = @extractor.results[2][:record]
+          lewisham_link = lewisham_result.detect{|r| r.has_key?(:link)}[:link]
+
+          @extractor.results.size.should == 10
+          lewisham_link.should match(/propertyID=95125/)
       end
     end
     

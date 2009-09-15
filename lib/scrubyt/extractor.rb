@@ -143,9 +143,15 @@ module Scrubyt
       end
             
       def parsed_doc
-        @parsed_doc ||= Nokogiri::HTML.parse(@agent_doc.body)
+        @parsed_doc ||= Nokogiri::HTML.parse(clean_class_spaces(@agent_doc.body))
         rescue NoMethodError
           @parsed_doc = Nokogiri::HTML.parse("")
+      end
+      
+      def clean_class_spaces(doc)
+        doc.gsub(/class=['"]([a-zA-Z0-9\- ]+)['"]/) do |matched|
+          %Q{class="#{$1.gsub(/[ ]+/, " ").strip}"}
+        end
       end
     
       def setup_agent

@@ -13,6 +13,7 @@ module Scrubyt
         store_url_helpers(@agent_doc.uri.to_s)
       rescue WWW::Mechanize::ResponseCodeError => err
       rescue EOFError
+      rescue SocketError
       end
     
       def fetch_next(result_name, *args)      
@@ -77,7 +78,7 @@ module Scrubyt
       
       def resolve_url(url)
         case url
-        when %r{^http[s]*:}
+        when %r{^http[s]*:|^file:}
           return url
         when %r{^/}
           return previous_base_path + url
@@ -135,7 +136,7 @@ module Scrubyt
         @previous_page = url.match(/[^\?]*/)[0]
         @previous_query = nil
         @previous_query = url.match(/\?(.*)/)[1] if has_query_string?(url)
-        @previous_base_path = url.match(%r{.*://[^/]*})[0]
+        @previous_base_path = url.match(%r{.*://[^/]*|.*:[^/]*})[0]
         @previous_path = url.match(%r{.*/})[0]
       end
       
