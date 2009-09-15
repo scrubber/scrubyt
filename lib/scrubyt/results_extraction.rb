@@ -18,17 +18,21 @@ module Scrubyt
           @results.first[name] = result
         end
         if parent_result?
-          notify(:save_results, name, @results)          
+          notify(:save_results, name, @results)
         end
         clear_current_result!
       end
-      
+
       def parent_result?
         @options[:parent]
       end
       
       def in_block?
-        !@options[:body].nil?
+        @options[:body]
+      end
+      
+      def first_child?
+        @options[:first_child]
       end
       
       def appending_to_results?
@@ -97,26 +101,35 @@ module Scrubyt
             matching_elements << merged_element
             all_matched_elements.reject!{|e| e.size < 1}
           end
-          matching_elements.map do |element|
+          results = matching_elements.map do |element|
             options = @options
             options.delete(:hash)
             child_extractor_options = options.merge(:body => element.to_s,
-                                                     :detail => true, :parent_url => previous_url)
-            { result_name => Extractor.new(child_extractor_options, &block).results }
+                                                    :detail => true, 
+                                                    :parent_url => previous_url,
+                                                     :first_child => options[:parent])
+            result = { result_name => Extractor.new(child_extractor_options, &block).results }
+            notify(:save_results, name, result) if first_child?
+            result
           end
         else
-          locators.map do |locator|
+          results = locators.map do |locator|
             parsed_doc.search(clean_xpath(locator)).map do |element|
               options = @options
               options.delete(:json)
               options[:json] = args.detect{|h| h.has_key?(:json)}[:json].to_json if args.detect{|h| h.has_key?(:json)}
               element_body = is_simple_match ? element.children.to_s : element.to_s
               child_extractor_options = options.merge(:body => element_body,
-                                                       :detail => true, :parent_url => previous_url)
-              { result_name => Extractor.new(child_extractor_options, &block).results }
+                                                       :detail => true, 
+                                                       :parent_url => previous_url,
+                                                       :first_child => options[:parent])
+              result = { result_name => Extractor.new(child_extractor_options, &block).results }
+              notify(:save_results, name, result) if first_child?
+              result
             end
           end.flatten
         end
+        return results unless first_child?
       end
       
       def merge_results(results, proc)
