@@ -2,12 +2,13 @@ require "#{File.dirname(__FILE__)}/logger.rb"
 require "#{File.dirname(__FILE__)}/navigation.rb"
 require "#{File.dirname(__FILE__)}/results_extraction.rb"
 require "#{File.dirname(__FILE__)}/inflections.rb"
+require "#{File.dirname(__FILE__)}/event_dispatcher.rb"
 require 'json'
-
+require 'nokogiri'
 
 module Scrubyt
   class Extractor
-    include EventDispatcher
+    include Scrubyt::EventDispatcher
     include Scrubyt::Navigation
     include Scrubyt::ResultsExtraction
     
@@ -17,6 +18,7 @@ module Scrubyt
     attr_reader   :extractor_definition
 
     def initialize(options = {}, &extractor_definition)
+      options[:parent] = !options[:parent] && !options[:child] ? true : false
       defaults = { :agent => :standard,
                    :output => :hash,
                    :child => true,

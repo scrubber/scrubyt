@@ -1,4 +1,5 @@
 require 'ruby-debug'
+require 'nokogiri'
 module Scrubyt
   module ResultsExtraction 
     private
@@ -16,10 +17,18 @@ module Scrubyt
           @results << {} unless @results.first
           @results.first[name] = result
         end
-        unless in_detail_block?
+        if parent_result?
           notify(:save_results, name, @results)          
         end
         clear_current_result!
+      end
+      
+      def parent_result?
+        @options[:parent]
+      end
+      
+      def in_block?
+        !@options[:body].nil?
       end
       
       def appending_to_results?
@@ -206,7 +215,9 @@ module Scrubyt
       end
       
       def clean_xpath(xpath)
-        xpath.sub(%r{^\./},"//").gsub(%r{/tbody},"")
+        xpath = xpath.sub(%r{^\./},"//").gsub(%r{/tbody},"")
+        xpath = xpath.sub(%r{^/([a-zA-Z])},"/html/body/\\1") if in_block?
+        xpath
       end
   end
 end
