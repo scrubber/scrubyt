@@ -8,19 +8,54 @@ module Scrubyt
         end        
 
         def submit(*args)
+          require 'ruby-debug'; debugger
           notify(:submit)
           if supplied_form_name?(args)
             find_form(form_name(args)) 
           elsif supplied_button_xpath?(args)
             xpathed_button = parsed_doc.search(clean_xpath(args.first)).first
-            @current_form = @agent_doc.forms.detect{|f| f.buttons.detect{|b| b.name == xpathed_button["name"] && b.value == xpathed_button["value"]}}
-            button = @current_form.buttons.detect{|b| b.name == xpathed_button["name"] && b.value == xpathed_button["value"]}
+            begin
+              @current_form = @agent_doc.forms.detect{|f| f.buttons.detect{|b| b.name == xpathed_button["name"] && b.value == xpathed_button["value"]}}
+              button = @current_form.buttons.detect{|b| b.name == xpathed_button["name"] && b.value == xpathed_button["value"]}
+            rescue NoMethodError
+              raise StandardError.new("No matching submit button found.")
+            end
           end
           fix_form_action
           button ||= find_button(args)
           @agent_doc = @agent.submit(current_form, button)
           store_url_helpers(@agent_doc.uri.to_s)
           reset_page_state!
+        end
+        
+        def click_checkbox(*args)
+          notify(:click_checkbox)
+          if supplied_button_xpath?(args)
+            xpathed_checkbox = parsed_doc.search(clean_xpath(args.first)).first
+            @current_form = @agent_doc.forms.detect{|f| f.checkboxes.detect{|c| c.name == xpathed_checkbox["name"]}}
+            checkbox = @current_form.checkboxes.detect{|c| c.name == xpathed_checkbox["name"]}
+          end          
+          checkbox.click
+        end
+        
+        def uncheck_checkbox(*args)
+          notify(:uncheck_checkbox)
+          if supplied_button_xpath?(args)
+            xpathed_checkbox = parsed_doc.search(clean_xpath(args.first)).first
+            @current_form = @agent_doc.forms.detect{|f| f.checkboxes.detect{|c| c.name == xpathed_checkbox["name"]}}
+            checkbox = @current_form.checkboxes.detect{|c| c.name == xpathed_checkbox["name"]}
+          end          
+          checkbox.uncheck
+        end
+        
+        def check_checkbox(*args)
+          notify(:check_checkbox)
+          if supplied_button_xpath?(args)
+            xpathed_checkbox = parsed_doc.search(clean_xpath(args.first)).first
+            @current_form = @agent_doc.forms.detect{|f| f.checkboxes.detect{|c| c.name == xpathed_checkbox["name"]}}
+            checkbox = @current_form.checkboxes.detect{|c| c.name == xpathed_checkbox["name"]}
+          end
+          checkbox.check
         end
 
         def form_name(options)        

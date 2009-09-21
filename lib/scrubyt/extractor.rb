@@ -149,7 +149,7 @@ module Scrubyt
       end
       
       def clean_class_spaces(doc)
-        doc.gsub(/class=['"]([a-zA-Z0-9\- ]+)['"]/) do |matched|
+        doc.gsub(/class=['"](([ ]+[^"]*)|([a-zA-Z0-9\-]+[ ]+[^"]*))['"]/) do |matched|
           %Q{class="#{$1.gsub(/[ ]+/, " ").strip}"}
         end
       end

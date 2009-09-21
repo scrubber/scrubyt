@@ -707,9 +707,12 @@ describe "Extractor" do
                        end
           lewisham_result = @extractor.results[2][:record]
           lewisham_link = lewisham_result.detect{|r| r.has_key?(:link)}[:link]
-
+          gipsy_hill_result = @extractor.results[3][:record]
+          gipsy_hill_link = gipsy_hill_result.detect{|r| r.has_key?(:link)}[:link]
+          
           @extractor.results.size.should == 10
           lewisham_link.should match(/propertyID=95125/)
+          gipsy_hill_link.should match(/propertyID=91459/)
       end
     end
     
