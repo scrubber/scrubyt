@@ -8,7 +8,6 @@ module Scrubyt
         end        
 
         def submit(*args)
-          require 'ruby-debug'; debugger
           notify(:submit)
           if supplied_form_name?(args)
             find_form(form_name(args)) 

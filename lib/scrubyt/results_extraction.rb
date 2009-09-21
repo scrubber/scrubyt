@@ -85,7 +85,6 @@ module Scrubyt
       end     
       
       def extract_detail(result_name, *args, &block)
-        require 'ruby-debug'; debugger
         locators = args.shift
         unless locators.is_a?(Array)
           is_simple_match = true
