@@ -8,6 +8,30 @@ require "rexml/element"
 describe "Extractor" do
   include MockFactory
   
+  describe "when scraping frames" do
+    before(:each) do
+      mock_frame_examples
+    end
+
+    it "should evaluate a framed XPath correctly" do
+      @extractor = Scrubyt::Extractor.new({}) do
+        fetch "http://scrubyt.test/frames/"
+        record "//body/frameset[1]/frameset[1]/frame[2]//table/tr/td[2]"        
+      end
+      
+      @extractor.results[0][:record].should == "Second Cell!"
+    end
+    
+    it "should have some more specs" do
+      pending
+    end
+
+    it "should have even more specs" do
+      pending
+    end
+    
+  end
+
   describe "when initializing" do
     
     def do_extractor(options = {})

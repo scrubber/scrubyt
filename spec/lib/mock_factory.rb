@@ -61,6 +61,19 @@ module MockFactory
     @mechanize_agent.stub!(:get).with("http://www.rubyrailways.com/").and_return(rubyrailways_page)
   end
   
+  def mock_frame_examples
+    @mechanize_agent = WWW::Mechanize.new  
+    WWW::Mechanize.stub!(:new).and_return(@mechanize_agent)
+    frame_page = mock_mechanize_page("http://scrubyt.test/frames/", File.open("#{mock_path}/frames/frame_test.html", "r").read)                                      
+    main_frame = mock_mechanize_page("http://scrubyt.test/frames/main.html", File.open("#{mock_path}/frames/main.html", "r").read)
+    ad_frame = mock_mechanize_page("http://scrubyt.test/frames/ad.html", File.open("#{mock_path}/frames/ad.html", "r").read)    
+    nav_frame = mock_mechanize_page("http://scrubyt.test/frames/nav.html", File.open("#{mock_path}/frames/nav.html", "r").read)
+    @mechanize_agent.stub!(:get).and_return(frame_page)
+    @mechanize_agent.stub!(:get).with("http://scrubyt.test/frames/main.html").and_return(main_frame)
+    @mechanize_agent.stub!(:get).with("http://scrubyt.test/frames/ad.html").and_return(ad_frame)
+    @mechanize_agent.stub!(:get).with("http://scrubyt.test/frames/nav.html").and_return(nav_frame)
+  end
+  
   def mock_named_form
     @field = mock("field")    
     @form.should_receive(:name).and_return("named_form")
