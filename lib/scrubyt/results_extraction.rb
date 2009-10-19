@@ -49,7 +49,7 @@ module Scrubyt
           debugger if options[:debug]          
           if locator.is_a?(Array)
             if options[:compound]
-              all_matched_elements = locator.map{|l| parsed_doc.search(clean_xpath(l)).to_a}
+              all_matched_elements = locator.map{|l| evaluate_xpath(l).to_a}
               matching_elements = []
               while(!all_matched_elements.empty?) do
                 merged_element = Nokogiri::HTML.parse("")
@@ -60,10 +60,10 @@ module Scrubyt
                 all_matched_elements.reject!{|e| e.size < 1}
               end
             else
-              matching_elements = locator.map{|l| parsed_doc.search(clean_xpath(l))}.flatten
+              matching_elements = locator.map{|l| evaluate_xpath(l)}.flatten
             end
           else
-            matching_elements = parsed_doc.search(clean_xpath(locator))
+            matching_elements = evaluate_xpath(locator)
           end
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
@@ -82,7 +82,43 @@ module Scrubyt
         ## Return only non-nil/empty results. Look at porting rails #blank?
         return @current_result = results.compact.reject{|r| r == ""} if options[:required]
         @current_result = results
-      end     
+      end  
+      
+      def evaluate_xpath(xpath)
+        if(xpath =~ /frameset/i)
+          xpath = clean_xpath(xpath)
+          ## split up the cleaned XPath to 2 parts:
+          ## - frame_path - just to grab the src attribute of the frame to navigate there
+          ## - element_path - the 'real' XPath pointing into the frame document
+          frame_path = xpath.scan(/.+frame.+?\]/)[0]
+          element_path = xpath[frame_path.size..-1]
+          
+          ## go there
+          ## TODO - how do we know whether we are still in that frame or not?!!?!?!?!?!
+          ## if we navigate away to a detail page, that's cool - however, what about the case
+          ##
+          ## parent1    ----> frames
+          ##   - child1
+          ##   - child2
+          ## parent2    ----> this is *not* in a frame, so the original doc should be re-loade
+          ##   - child 3
+          ##
+          ## I think this case is highly unlikely to ever come up 
+          ## and btw an easy workaround is to put parent2 before parent1
+          ## but there might be another cases?
+          ## dunno and don't want to spend too much time w/ it now
+          p parsed_doc
+          p frame_path
+          frame_src = parsed_doc.search(frame_path)[0].attributes["src"]
+          fetch(frame_src)
+          reset_page_state!
+          
+          ## and evaluate the XPath
+          parsed_doc.search(element_path)
+        else
+          parsed_doc.search(clean_xpath(xpath))
+        end
+      end
       
       def extract_detail(result_name, *args, &block)
         locators = args.shift
@@ -91,7 +127,7 @@ module Scrubyt
           locators = [locators] 
         end
         if args.include?({:compound => true})
-          all_matched_elements = locators.map{|l| parsed_doc.search(clean_xpath(l)).to_a}
+          all_matched_elements = locators.map{|l| evaluate_xpath(l).to_a}
           matching_elements = []
           while(!all_matched_elements.empty?) do
             merged_element = Nokogiri::HTML.parse("")
@@ -114,7 +150,7 @@ module Scrubyt
           end
         else
           results = locators.map do |locator|
-            parsed_doc.search(clean_xpath(locator)).map do |element|
+            evaluate_xpath(locator).map do |element|
               options = @options
               options.delete(:json)
               options[:json] = args.detect{|h| h.has_key?(:json)}[:json].to_json if args.detect{|h| h.has_key?(:json)}
