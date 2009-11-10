@@ -638,7 +638,18 @@ describe "Extractor" do
         end
         @extractor.results.size.should == 1
       end
-            
+      
+      it "should grab only matching text from an element" do
+        @extractor = Scrubyt::Extractor.new do
+          fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
+          result_detail "//table[@id='searchTemplate']//td[@class='dataColumn']//tr[1]/td[1]/a" do
+            book_title "//h1", :grab => /[a-z0-9]+/i
+          end
+        end
+        @extractor.results.should include(:result => [{ :book_title => "The" }])
+        @extractor.results.should include(:result => [{ :book_title => "Beginning" }])
+      end
+
       it "should return results from next pages" do
         @extractor = Scrubyt::Extractor.new do
           fetch "http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"

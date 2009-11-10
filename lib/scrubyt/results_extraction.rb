@@ -54,7 +54,12 @@ module Scrubyt
               while(!all_matched_elements.empty?) do
                 merged_element = Nokogiri::HTML.parse("")
                 all_matched_elements.size.times do |i|
-                  merged_element.add_child all_matched_elements[i].shift
+                  next_element = all_matched_elements[i].shift
+                  if merged_element.root
+                    merged_element.root.add_child next_element
+                  else
+                    merged_element.add_child next_element
+                  end
                 end
                 matching_elements << merged_element
                 all_matched_elements.reject!{|e| e.size < 1}
@@ -67,8 +72,8 @@ module Scrubyt
           end
           return merge_elements(matching_elements, options[:script]) if merge_elements?(locator)
           matching_elements.each do |element|
-            element = process_proc(element, options[:hpricot_script])
             result = get_value(element, attribute(options, :text))
+            result = grab_result(result, options[:grab])
             results << process_proc(result, options[:script])
           end
         end
@@ -132,7 +137,11 @@ module Scrubyt
           while(!all_matched_elements.empty?) do
             merged_element = Nokogiri::HTML.parse("")
             all_matched_elements.size.times do |i|
-              merged_element.add_child all_matched_elements[i].shift
+              if merged_element.root
+                merged_element.root.add_child all_matched_elements[i].shift
+              else
+                merged_element.add_child all_matched_elements[i].shift
+              end
             end
             matching_elements << merged_element
             all_matched_elements.reject!{|e| e.size < 1}
@@ -256,6 +265,16 @@ module Scrubyt
         rescue
         end
         string_input
+      end
+      
+      def grab_result(string_input, regexp)
+        return string_input unless regexp
+        result = string_input.scan(regexp)
+        if result.first.is_a?(Array)
+          result.first.first
+        else
+          result.first
+        end
       end
       
       def merge_elements?(locator)
