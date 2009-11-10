@@ -68,6 +68,7 @@ module Scrubyt
       end
       
       def execute_json(json)
+        json.each{|h| h.symbolize_keys!}
         json.each do |hash|
           hash.each do |k,v|
             case v
@@ -78,16 +79,16 @@ module Scrubyt
             when Array
               send(k, *v)
             when Hash
-              if v.has_key?("xpath") && v.has_key?("block")
+              if v.has_key?(:xpath) && v.has_key?(:block)
                 code = []
-                code << %Q{#{k.to_s} "#{v["xpath"]}", :json => #{v["block"].inspect}}
+                code << %Q{#{k.to_s} "#{v[:xpath]}", :json => #{v[:block].inspect}}
                 instance_eval(code.join("\n"))
-              elsif v.has_key?("xpath")
-                element = v.delete("xpath")
+              elsif v.has_key?(:xpath)
+                element = v.delete(:xpath)
                 args = [element, v]
                 send(k, *args)
-              elsif v.has_key?("url")
-                element = v.delete("xpath")
+              elsif v.has_key?(:url)
+                element = v.delete(:xpath)
                 args = ["current_url", v]
                 send(k, *args)
               end
@@ -99,7 +100,7 @@ module Scrubyt
       end
       
       def strip_navigation(json)
-        json.reject{|s| s.has_key?("submit")}
+        json.reject{|s| s.has_key?(:submit)}
       end
       
       def setup_logger

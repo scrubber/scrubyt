@@ -269,6 +269,14 @@ module Scrubyt
       
       def grab_result(string_input, regexp)
         return string_input unless regexp
+        if regexp.is_a?(String)
+          modifiers = []
+          regexp, requested_modifiers = regexp.split(%r{/([im])+$}x)
+          regexp.gsub!(%r{^/|/$}, "")
+          modifiers << Regexp::IGNORECASE if requested_modifiers =~ /i/i
+          modifiers << Regexp::MULTILINE if requested_modifiers =~ /m/i
+          regexp = Regexp.new(regexp, *modifiers) 
+        end
         result = string_input.scan(regexp)
         if result.first.is_a?(Array)
           result.first.first
