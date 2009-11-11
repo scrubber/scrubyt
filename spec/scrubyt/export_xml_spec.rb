@@ -15,6 +15,10 @@ describe "XML Export Format" do
            :book_title=>"The Ruby Way"}]}]
   end
   
+  before(:each) do
+    pending
+  end
+  
   it "should extend Array to have to_xml method" do
     result = Array.new
     result.respond_to?(:to_xml).should be
