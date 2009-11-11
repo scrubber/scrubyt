@@ -41,6 +41,7 @@ module Scrubyt
       
       def extract_result(result_name, locator, options = {})
         return @current_result if @current_result  
+        # require "ruby-debug"; debugger
         results = []
         if locator == "current_url"
           results << process_proc(previous_url, options[:script])
@@ -216,14 +217,14 @@ module Scrubyt
       def missing_required_results?(method_name, *args)
         if has_result_definition?(*args)
           result = extract_result(method_name, *args)
-          return result.compact.empty? && args.last[:required]
+          return result.compact.empty? && args.last.is_a?(Hash) && args.last[:required]
         end
       end
 
       def drop_empty_result?(method_name, *args)
         if has_result_definition?(*args)
           result = extract_result(method_name, *args)
-          return result.compact.empty? && args.last[:remove_blank]
+          return result.compact.empty? && args.last.is_a?(Hash) && args.last[:remove_blank]
         end
       end
       

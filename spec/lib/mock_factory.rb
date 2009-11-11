@@ -26,13 +26,13 @@ module MockFactory
                mock("button", :value => "Search", :name => "btnG")]
     @form.stub!(:buttons).and_return(buttons)
     test_file = "#{mock_path}/google_results.html"
-    @mechanize_page.stub!(:body).and_return(File.open(test_file, "r").read)
+    @mechanize_page.stub!(:body).and_return(File.open(test_file, "r:iso-8859-1").read)
   end
   
   def mock_extended_examples
     mock_mechanize
     examples_file = "#{mock_path}/extended_examples.html"
-    @mechanize_page.stub!(:body).and_return(File.open(examples_file, "r").read)
+    @mechanize_page.stub!(:body).and_return(File.open(examples_file, "r:iso-8859-1").read)
   end
   
   def mock_mechanize_page(url, body)
@@ -47,12 +47,12 @@ module MockFactory
   def mock_cross_site_examples
     @mechanize_agent = WWW::Mechanize.new
     WWW::Mechanize.stub!(:new).and_return(@mechanize_agent)
-    index_page = mock_mechanize_page("http://scrubyt.test/", File.open("#{mock_path}/cross_site_mock.html", "r").read)
-    results_page = mock_mechanize_page("http://scrubyt.test/cross_site_results_mock.html", File.open("#{mock_path}/cross_site_results_mock.html", "r").read)
-    scrubyt_page = mock_mechanize_page("http://www.scrubyt.org", File.open("#{mock_path}/cross_site_ext_scrubyt_mock.html", "r").read)
-    rubypond_page = mock_mechanize_page("http://rubypond.com", File.open("#{mock_path}/cross_site_ext_rubypond_mock.html", "r").read)
-    hexagile_page = mock_mechanize_page("http://www.hexagile.com", File.open("#{mock_path}/cross_site_ext_hexagile_mock.html", "r").read)
-    rubyrailways_page = mock_mechanize_page("http://www.rubyrailways.com", File.open("#{mock_path}/cross_site_ext_rubyrailways_mock.html", "r").read)
+    index_page = mock_mechanize_page("http://scrubyt.test/", File.open("#{mock_path}/cross_site_mock.html", "r:iso-8859-1").read)
+    results_page = mock_mechanize_page("http://scrubyt.test/cross_site_results_mock.html", File.open("#{mock_path}/cross_site_results_mock.html", "r:iso-8859-1").read)
+    scrubyt_page = mock_mechanize_page("http://www.scrubyt.org", File.open("#{mock_path}/cross_site_ext_scrubyt_mock.html", "r:iso-8859-1").read)
+    rubypond_page = mock_mechanize_page("http://rubypond.com", File.open("#{mock_path}/cross_site_ext_rubypond_mock.html", "r:iso-8859-1").read)
+    hexagile_page = mock_mechanize_page("http://www.hexagile.com", File.open("#{mock_path}/cross_site_ext_hexagile_mock.html", "r:iso-8859-1").read)
+    rubyrailways_page = mock_mechanize_page("http://www.rubyrailways.com", File.open("#{mock_path}/cross_site_ext_rubyrailways_mock.html", "r:iso-8859-1").read)
     @mechanize_agent.stub!(:get).and_return(results_page)
     @mechanize_agent.stub!(:get).with("http://scrubyt.test/").and_return(index_page)
     @mechanize_agent.stub!(:get).with("http://www.scrubyt.org/").and_return(scrubyt_page)
@@ -64,10 +64,10 @@ module MockFactory
   def mock_frame_examples
     @mechanize_agent = WWW::Mechanize.new  
     WWW::Mechanize.stub!(:new).and_return(@mechanize_agent)
-    frame_page = mock_mechanize_page("http://scrubyt.test/frames/", File.open("#{mock_path}/frames/frame_test.html", "r").read)                                      
-    main_frame = mock_mechanize_page("http://scrubyt.test/frames/main.html", File.open("#{mock_path}/frames/main.html", "r").read)
-    ad_frame = mock_mechanize_page("http://scrubyt.test/frames/ad.html", File.open("#{mock_path}/frames/ad.html", "r").read)    
-    nav_frame = mock_mechanize_page("http://scrubyt.test/frames/nav.html", File.open("#{mock_path}/frames/nav.html", "r").read)
+    frame_page = mock_mechanize_page("http://scrubyt.test/frames/", File.open("#{mock_path}/frames/frame_test.html", "r:iso-8859-1").read)                                      
+    main_frame = mock_mechanize_page("http://scrubyt.test/frames/main.html", File.open("#{mock_path}/frames/main.html", "r:iso-8859-1").read)
+    ad_frame = mock_mechanize_page("http://scrubyt.test/frames/ad.html", File.open("#{mock_path}/frames/ad.html", "r:iso-8859-1").read)    
+    nav_frame = mock_mechanize_page("http://scrubyt.test/frames/nav.html", File.open("#{mock_path}/frames/nav.html", "r:iso-8859-1").read)
     @mechanize_agent.stub!(:get).and_return(frame_page)
     @mechanize_agent.stub!(:get).with("http://scrubyt.test/frames/main.html").and_return(main_frame)
     @mechanize_agent.stub!(:get).with("http://scrubyt.test/frames/ad.html").and_return(ad_frame)
@@ -92,17 +92,17 @@ module MockFactory
     @result_page2 = mock("result")
     @result_page3 = mock("result")
     @result_page4 = mock("result")
-    @results_list1.stub!(:body).and_return(File.open(results+"_page_1.html", "r").read)
+    @results_list1.stub!(:body).and_return(File.open(results+"_page_1.html", "r:iso-8859-1").read)
     @results_list1.stub!(:uri).and_return("http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0")
-    @results_list2.stub!(:body).and_return(File.open(results+"_page_2.html", "r").read)
+    @results_list2.stub!(:body).and_return(File.open(results+"_page_2.html", "r:iso-8859-1").read)
     @results_list2.stub!(:uri).and_return("http://www.amazon.com/s/qid=1216806952/ref=sr_pg_2?ie=UTF8&rs=&keywords=ruby&rh=i%3Aaps%2Ck%3Aruby&page=2")
-    @result_page1.stub!(:body).and_return(File.open(results+"_1.html", "r").read)
+    @result_page1.stub!(:body).and_return(File.open(results+"_1.html", "r:iso-8859-1").read)
     @result_page1.stub!(:uri).and_return("http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1216806952&sr=8-1")
-    @result_page2.stub!(:body).and_return(File.open(results+"_2.html", "r").read)
+    @result_page2.stub!(:body).and_return(File.open(results+"_2.html", "r:iso-8859-1").read)
     @result_page2.stub!(:uri).and_return("http://www.amazon.com/Beginning-Ruby-Novice-Professional/dp/1590597664/ref=pd_bbs_2_s9_rk?ie=UTF8&s=books&s9r=8a5801be1145d82801118ed052b50980&itemPosition=2&qid=1216806952&sr=8-2")
-    @result_page3.stub!(:body).and_return(File.open(results+"_3.html", "r").read)
+    @result_page3.stub!(:body).and_return(File.open(results+"_3.html", "r:iso-8859-1").read)
     @result_page3.stub!(:uri).and_return("http://www.amazon.com/Yellow-Gold-1-3ct-Ruby-Sapphire/dp/B00073G87O/ref=sr_1_17?ie=UTF8&s=jewelry&qid=1216806934&sr=8-17")
-    @result_page4.stub!(:body).and_return(File.open(results+"_4.html", "r").read)
+    @result_page4.stub!(:body).and_return(File.open(results+"_4.html", "r:iso-8859-1").read)
     @result_page4.stub!(:uri).and_return("http://www.amazon.com/Sea-Lion-Ruby-Suns/dp/B0012IWHLE/ref=sr_1_18?ie=UTF8&s=music&qid=1216806934&sr=8-18")
     @mechanize_agent.stub!(:get).with("http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Daps&field-keywords=ruby&x=0&y=0"
         ).and_return(@results_list1)
