@@ -1,4 +1,3 @@
-require 'ruby-debug'
 require 'nokogiri'
 module Scrubyt
   module ResultsExtraction 
@@ -41,13 +40,11 @@ module Scrubyt
       
       def extract_result(result_name, locator, options = {})
         return @current_result if @current_result  
-        # require "ruby-debug"; debugger
         results = []
         if locator == "current_url"
           results << process_proc(previous_url, options[:script])
           return results
         else 
-          debugger if options[:debug]          
           if locator.is_a?(Array)
             if options[:compound]
               all_matched_elements = locator.map{|l| evaluate_xpath(l).to_a}
