@@ -1,27 +1,21 @@
-# require 'rexml/document'
-require 'nokogiri'
+require 'rexml/document'
 module Scrubyt
   class Inflector
     
-    def self.to_xml(results, node_name = nil)      
-      xml = []
+    def self.to_xml(results, node_name = nil)
+      xml = []      
       xml << "<#{node_name}>" if node_name
-      document = Nokogiri::XML::Document.new
       if results.is_a?(String)
-        node = Nokogiri::XML::Node.new(node_name.to_s, document)
-        document << node
-        node.content = results
+        node = REXML::Element.new node_name.to_s
+        node.text = results
         return node.to_s
       elsif results.is_a?(Hash)
         results.each do |k,v|
-          node = Nokogiri::XML::Node.new(k.to_s, document)
+          node = REXML::Element.new k.to_s
           if v.is_a?(Hash) || v.is_a?(Array)
-            nodes = Nokogiri::XML::DocumentFragment.parse(v.to_xml).children
-            nodes.each do |n|
-              node << n
-            end
+            node << REXML::Text.new(v.to_xml, true, nil, true, nil, true)
           else
-            node.content = v
+            node.text = v
           end
           xml << node.to_s
         end

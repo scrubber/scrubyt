@@ -1,3 +1,4 @@
+require 'ruby-debug'
 require 'nokogiri'
 module Scrubyt
   module ResultsExtraction 
@@ -38,13 +39,19 @@ module Scrubyt
         @results.first.is_a?(Array)
       end
       
-      def extract_result(result_name, locator, options = {})
+      def extract_result(result_name, locator, options = {})        
         return @current_result if @current_result  
         results = []
-        if locator == "current_url"
-          results << process_proc(previous_url, options[:script])
+        if locator == "source"
+          result = parsed_doc.to_s
+          results << process_proc(result, options[:script])
+          return results
+        elsif locator == "current_url"
+          result = grab_result(previous_url, options[:grab])
+          results << process_proc(result, options[:script])
           return results
         else 
+          debugger if options[:debug]          
           if locator.is_a?(Array)
             if options[:compound]
               all_matched_elements = locator.map{|l| evaluate_xpath(l).to_a}
@@ -211,17 +218,21 @@ module Scrubyt
         method_name == :current_url
       end
       
+      def wants_html?(method_name)
+        method_name == :html
+      end
+      
       def missing_required_results?(method_name, *args)
         if has_result_definition?(*args)
           result = extract_result(method_name, *args)
-          return result.compact.empty? && args.last.is_a?(Hash) && args.last[:required]
+          return result.compact.empty? && args.last[:required]
         end
       end
 
       def drop_empty_result?(method_name, *args)
         if has_result_definition?(*args)
           result = extract_result(method_name, *args)
-          return result.compact.empty? && args.last.is_a?(Hash) && args.last[:remove_blank]
+          return result.compact.empty? && args.last[:remove_blank]
         end
       end
       
@@ -253,13 +264,20 @@ module Scrubyt
       def has_result_definition?(*args)
         return false if args.empty?
         return true if args.first == "current_url"
+        return true if args.first == "source"
         return true if args.first.is_a?(Array) && args.first.first.match(%r{(^//)|(^/[a-zA-Z])|(^\./)})
         args.first.match(%r{(^//)|(^/[a-zA-Z])|(^\./)})
       end
       
       def process_proc(string_input, proc)
         begin
-          string_input = proc.call(string_input) if proc
+          if proc
+            if proc.is_a?(Proc)
+              string_input = proc.call(string_input)
+            else
+              string_input = eval(proc).call(string_input)
+            end
+          end
         rescue
         end
         string_input

@@ -40,6 +40,10 @@ module Scrubyt
         @extractor_definition = extractor_definition
         instance_eval(&extractor_definition)
       end
+      if @json_next_defined      
+        # require "ruby-debug"; debugger
+        # execute_json(strip_navigation(json)) 
+      end
       unless in_detail_block?
         clear_results! 
         notify(:end)
@@ -60,6 +64,7 @@ module Scrubyt
         return required_failure! if missing_required_results?(method_name, *args)
         unless required_failure?
           return save_result(:current_url, previous_url) if wants_current_url?(method_name)
+          return save_result(:html, parsed_doc.to_s) if wants_html?(method_name)
           return if drop_empty_result?(method_name, *args)
           return save_result(method_name, extract_result(method_name, *args)) if result_node?(method_name, *args)
           return save_result(method_name, extract_result(method_name, *args)) if result_set?(method_name, *args)
@@ -68,39 +73,44 @@ module Scrubyt
       end
       
       def execute_json(json)
-        json.each{|h| h.symbolize_keys!}
-        json.each do |hash|
-          hash.each do |k,v|
-            case v
-            when NilClass
-              send k
-            when String
-              send(k, v)
-            when Array
-              send(k, *v)
-            when Hash
-              if v.has_key?(:xpath) && v.has_key?(:block)
-                code = []
-                code << %Q{#{k.to_s} "#{v[:xpath]}", :json => #{v[:block].inspect}}
-                instance_eval(code.join("\n"))
-              elsif v.has_key?(:xpath)
-                element = v.delete(:xpath)
-                args = [element, v]
-                send(k, *args)
-              elsif v.has_key?(:url)
-                element = v.delete(:xpath)
-                args = ["current_url", v]
-                send(k, *args)
+        sanitized_json = json.dup
+        begin
+          sanitized_json.each{|h| h.symbolize_keys!}
+          sanitized_json.each do |hash|
+            hash.each do |k,v|
+              case v
+              when NilClass
+                send k
+              when String
+                send(k, v)
+              when Array
+                send(k, *v)
+              when Hash
+                if v.has_key?(:xpath) && v.has_key?(:block)
+                  code = []
+                  code << %Q{#{k.to_s} "#{v[:xpath]}", :json => #{v[:block].inspect}}
+                  instance_eval(code.join("\n"))
+                elsif v.has_key?(:xpath)
+                  element = v.delete(:xpath)
+                  args = [element, v]
+                  send(k, *args)
+                elsif v.has_key?(:url)
+                  element = v.delete(:xpath)
+                  args = ["current_url", v]
+                  send(k, *args)
+                end
               end
             end
           end
+        rescue Scrubyt::ScrapeNextJSONPage => err
+          @json_next_defined = true
+          sanitized_json = strip_navigation(sanitized_json)
+          retry unless @options[:limit] <= 0
         end
-      rescue Scrubyt::ScrapeNextJSONPage => err
-        execute_json(strip_navigation(json))
       end
       
       def strip_navigation(json)
-        json.reject{|s| s.has_key?(:submit)}
+        json.reject{|s| s.has_key?(:submit) }
       end
       
       def setup_logger

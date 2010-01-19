@@ -14,7 +14,7 @@ describe "Extractor" do
     end
 
     it "should evaluate a framed XPath correctly" do
-      @extractor = Scrubyt::Extractor.new do
+      @extractor = Scrubyt::Extractor.new({}) do
         fetch "http://scrubyt.test/frames/"
         record "//body/frameset[1]/frameset[1]/frame[2]//table/tr/td[2]"        
       end
@@ -803,7 +803,6 @@ describe "Extractor" do
     describe "to an xml file" do
       
       before(:each) do
-        pending
         mock_google_results
         @file =  mock("file")
         @file.stub!(:write)
