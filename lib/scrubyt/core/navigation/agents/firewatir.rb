@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'firewatir'
 
 module Scrubyt
@@ -49,7 +50,7 @@ module Scrubyt
               handle_relative_url(doc_url, resolve)
               Scrubyt.log :ACTION, "fetching document: #{@@current_doc_url}"
               case @@current_doc_protocol
-                when 'file': @@agent.goto("file://"+ @@current_doc_url)
+                when 'file' then @@agent.goto("file://"+ @@current_doc_url)
                 else @@agent.goto(@@current_doc_url)
               end
               @@mechanize_doc = "<html>#{@@agent.html}</html>"
