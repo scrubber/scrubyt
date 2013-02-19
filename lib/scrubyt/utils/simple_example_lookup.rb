@@ -15,7 +15,7 @@ module Scrubyt
     #
     #In this case, <a>'s text is considered to be "Bon nuit, monsieur"
     def self.find_node_from_text(doc, text, next_link=false, index = 0)
-      text.gsub!('»', '&#187;')
+      text.gsub!("\u00BB", '&#187;')
       #Process immediate attribute extraction (like "go to google.com/@href")
       if text =~ /.+\/@.+$/
         text = text.scan(/^(.+?)\/@.+$/)[0][0]

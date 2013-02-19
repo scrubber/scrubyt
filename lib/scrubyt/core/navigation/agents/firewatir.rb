@@ -49,7 +49,7 @@ module Scrubyt
               handle_relative_url(doc_url, resolve)
               Scrubyt.log :ACTION, "fetching document: #{@@current_doc_url}"
               case @@current_doc_protocol
-                when 'file': @@agent.goto("file://"+ @@current_doc_url)
+                when 'file' then @@agent.goto("file://"+ @@current_doc_url)
                 else @@agent.goto(@@current_doc_url)
               end
               @@mechanize_doc = "<html>#{@@agent.html}</html>"
@@ -59,12 +59,12 @@ module Scrubyt
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
             store_host_name(@@agent.url)   # in case we're on a new host
           end
-          
+
           def self.use_current_page
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
           end
-          
+
           def self.frame(attribute, value)
             if @@current_frame
               @@current_frame.frame(attribute, value)
@@ -78,14 +78,14 @@ module Scrubyt
           def self.submit(current_form, sleep_time=nil, button=nil, type=nil)
             if @@current_frame
               #BRUTAL hax but FW is such a shitty piece of software
-              #this sucks FAIL omg            
+              #this sucks FAIL omg
               @@current_frame.locate
               form = Document.new(@@current_frame).all.find{|t| t.tagName=="FORM"}
               form.submit
             else
               @@agent.element_by_xpath(@@current_form).submit
-            end            
-            
+            end
+
             if sleep_time
               sleep sleep_time
               @@agent.wait
@@ -101,56 +101,56 @@ module Scrubyt
           def self.click_link(link_spec,index = 0,wait_secs=0)
             Scrubyt.log :ACTION, "Clicking link specified by: %p" % link_spec
             if link_spec.is_a?(Hash)
-              elem = XPathUtils.generate_XPath(CompoundExampleLookup.find_node_from_compund_example(@@hpricot_doc, link_spec, false, index), nil, true) 
+              elem = XPathUtils.generate_XPath(CompoundExampleLookup.find_node_from_compund_example(@@hpricot_doc, link_spec, false, index), nil, true)
               result_page = @@agent.element_by_xpath(elem).click
             else
               @@agent.link(:innerHTML, Regexp.escape(link_spec)).click
-            end            
+            end
             sleep(wait_secs) if wait_secs > 0
             @@agent.wait
-            
+
             # evaluate the results
             extractor.evaluate_extractor
-            
+
             @@current_doc_url = @@agent.url
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
             Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
-          end    
-          
+          end
+
           def self.click_by_xpath_if_exists(xpath, wait_secs=0)
             begin
               result_page = @@agent.element_by_xpath(xpath).click
               sleep(wait_secs) if wait_secs > 0
               @@agent.wait
-              
+
               extractor.evaluate_extractor
-              
+
               @@current_doc_url = @@agent.url
               @@mechanize_doc = "<html>#{@@agent.html}</html>"
               @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
-              Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"              
+              Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
             rescue Watir::Exception::UnknownObjectException
               Scrubyt.log :INFO, "XPath #{xpath} doesn't exist in this document"
             end
-          end      
+          end
 
           def self.click_by_xpath(xpath, wait_secs=0)
-            Scrubyt.log :ACTION, "Clicking by XPath : %p" % xpath        
+            Scrubyt.log :ACTION, "Clicking by XPath : %p" % xpath
             @@agent.element_by_xpath(xpath).click
             Scrubyt.log :INFO, "sleeping #{wait_secs}..."
             sleep(wait_secs) if wait_secs > 0
             @@agent.wait
-            
+
             # evaluate the results
             extractor.evaluate_extractor
-            
+
             @@current_doc_url = @@agent.url
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
-            Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"            
+            Scrubyt.log :ACTION, "Fetching #{@@current_doc_url}"
           end
-          
+
           def self.click_image_map(index = 0)
             Scrubyt.log :ACTION, "Clicking image map at index: %p" % index
             uri = @@mechanize_doc.search("//area")[index]['href']
@@ -227,19 +227,19 @@ module Scrubyt
                 @@current_doc_url = resolve + doc_url
             end
           end
-        
+
           def self.fill_textfield(textfield_name, query_string, wait_secs, useValue)
             @@current_form = "//input[@name='#{textfield_name}']/ancestor::form"
             target = @@current_frame || @@agent
             if useValue
-              target.text_field(:name,textfield_name).value = query_string              
+              target.text_field(:name,textfield_name).value = query_string
             else
               target.text_field(:name,textfield_name).set(query_string)
             end
             sleep(wait_secs) if wait_secs > 0
             @@mechanize_doc = "<html>#{@@agent.html}</html>"
             @@hpricot_doc = Hpricot(PreFilterDocument.br_to_newline(@@mechanize_doc))
-            
+
           end
 
           ##
@@ -269,17 +269,17 @@ module Scrubyt
           def self.click_image_map(index=0)
             raise 'NotImplemented'
           end
-          
+
           def self.wait(time=1)
             sleep(time)
             @@agent.wait
           end
-          
+
           def self.close_firefox
             @@agent.close
           end
         end
-      end   
+      end
     end
   end
 end
