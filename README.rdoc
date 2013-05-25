@@ -29,24 +29,22 @@ scRUBYt! :-)
 
 Let's apply the "show don't tell" principle. Okay, here we go:
 
-<tt>ebay_data = Scrubyt::Extractor.define do</tt>
+  ebay_data = Scrubyt::Extractor.define do
+    fetch 'http://www.ebay.com/'
+    fill_textfield 'satitle', 'ipod'
+    submit
+    click_link 'Apple iPod'
 
-  fetch 'http://www.ebay.com/'
-  fill_textfield 'satitle', 'ipod'
-  submit
-  click_link 'Apple iPod'
-  
-  record do
-    item_name 'APPLE NEW IPOD MINI 6GB MP3 PLAYER SILVER'
-    price '$71.99'
+    record do
+      item_name 'APPLE NEW IPOD MINI 6GB MP3 PLAYER SILVER'
+      price '$71.99'
+    end
+    next_page 'Next >', :limit => 5
   end
-  next_page 'Next >', :limit => 5
-
-<tt>end</tt>
 
 output:
 
-<tt><root></tt>
+  <root>
     <record>
       <item_name>APPLE IPOD NANO 4GB - PINK - MP3 PLAYER</item_name>
       <price>$149.95</price>
@@ -60,7 +58,7 @@ output:
       <price>$171.06</price>
     </record>
     <!-- another 200+ results -->
-<tt></root></tt>
+  </root>
 
 This was a relatively beginner-level example (scRUBYt knows a lot more than this and there are much complicated 
 extractors than the above one) - yet it did a lot of things automagically. First of all,
@@ -74,13 +72,13 @@ result pages. Not so bad for about 10 lines of code, eh?
 You can find everything you will need at these addresses (or if not, I doubt you will find it elsewhere...). See the 
 next section about installation, and after installing be sure to check out these URLs:
 
-* <a href='http://www.rubyrailways.com'>rubyrailways.com</a> - for some theory; if you would like to take a sneak peek 
+* rubyrailways.com - for some theory; if you would like to take a sneak peek 
 at web scraping in general and/or you would like to understand what's going on under the hood, check out <a 
 href='http://www.rubyrailways.com/data-extraction-for-web-20-screen-scraping-in-rubyrails'>this article about 
 web-scraping</a>!
-* <a href='http://scrubyt.org'>http://scrubyt.org</a> - your source of tutorials, howtos, news etc.
-* <a href='http://scrubyt.rubyforge.org'>scrubyt.rubyforge.org</a> - for an up-to-date, online Rdoc
-* <a href='http://projects.rubyforge.org/scrubyt'>projects.rubyforge.org/scrubyt</a> - for developer info, including 
+* http://scrubyt.org - your source of tutorials, howtos, news etc.
+* scrubyt.rubyforge.org - for an up-to-date, online Rdoc
+* projects.rubyforge.org/scrubyt - for developer info, including 
 open and closed bugs, files etc.
 * projects.rubyforge.org/scrubyt/files... - fair amount (and still growing with every release) of examples, showcasing 
 the features of scRUBYt!
