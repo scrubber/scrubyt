@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Scrubyt
   #=<tt>Lookup of simple examples</tt>
   #There are two types of string examples in scRUBYt! right now:

@@ -14,7 +14,7 @@ module Scrubyt
 
       def self.included(base)
         base.module_eval do 
-          @@agent = WWW::Mechanize.new
+          @@agent = Mechanize::Mechanize.new
           @@current_doc_url = nil
           @@current_doc_protocol = nil
           @@base_dir = nil
